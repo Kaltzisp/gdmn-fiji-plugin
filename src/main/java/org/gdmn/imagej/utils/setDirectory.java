@@ -1,8 +1,9 @@
 package org.gdmn.imagej.utils;
 
 import ij.io.DirectoryChooser;
+import ij.plugin.PlugIn;
 
-public class setDirectory implements ij.plugin.PlugIn {
+public class setDirectory implements PlugIn {
 
     public void run(String arg) {
         // Getting default directory.
