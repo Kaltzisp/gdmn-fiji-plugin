@@ -1,4 +1,4 @@
-package org.gdmn.imagej.utils;
+package org.gdmn.imagej.debug;
 
 import ij.IJ;
 import ij.plugin.PlugIn;
