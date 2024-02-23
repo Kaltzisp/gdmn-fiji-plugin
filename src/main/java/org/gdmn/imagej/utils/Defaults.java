@@ -42,7 +42,6 @@ public class Defaults {
                 List<String> lines = Files.readAllLines(tmpPath);
                 List<String> modifiedLines = new ArrayList<>();
                 for (String store:lines) {
-                    IJ.log(store);
                     if (key.equals(store.split("=")[0])) {
                         store = key + "=" + value;
                     }
