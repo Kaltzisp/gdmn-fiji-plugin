@@ -20,13 +20,13 @@ public class BatchCommand implements Command, Interactive, Previewable {
     private String fileChooserMessage = "<h2 style='width: 500px'>Select the parent directory and target file pattern.</h2>";
 
     @Parameter(label = "Parent directory:", callback = "updateCollectorInfo")
-    private String selectedDir = this.defaultDir;
+    public String selectedDir = this.defaultDir;
 
     @Parameter(label = "Browse...", callback = "selectDir")
     private Button selectDir;
 
     @Parameter(label = "File pattern:", callback = "updateCollectorInfo")
-    private String filePattern = this.defaultFilePattern;
+    public String filePattern = this.defaultFilePattern;
 
     @Parameter(visibility = ItemVisibility.MESSAGE)
     private String targetMessage = setTargetMessage();
@@ -59,7 +59,7 @@ public class BatchCommand implements Command, Interactive, Previewable {
         }
     }
 
-    public String setTargetMessage() {
+    private String setTargetMessage() {
         if (this.nTargetFiles > 1 ) {
             this.targetMessage = "<p style='color:#006600'>ImageJ has identified " + this.nTargetFiles + " images which match these parameters.</p>";
         } else if (this.nTargetFiles == 1) {
