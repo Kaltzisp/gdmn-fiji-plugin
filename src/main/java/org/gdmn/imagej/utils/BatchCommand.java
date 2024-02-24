@@ -14,7 +14,7 @@ import ij.io.DirectoryChooser;
 public class BatchCommand implements Command, Interactive, Previewable {
     private String defaultFilePattern = "roi.tif";
     private String defaultDir = org.gdmn.imagej.utils.Defaults.get("dir");
-    private int nTargetFiles = FileFinder.count(this.defaultDir, this.defaultFilePattern);
+    private int nTargetFiles = Filer.getFiles(this.defaultDir, this.defaultFilePattern).size();
 
     @Parameter(visibility = ItemVisibility.MESSAGE)
     private String fileChooserMessage = "<h2 style='width: 500px'>Select the parent directory and target file pattern.</h2>";
@@ -45,7 +45,7 @@ public class BatchCommand implements Command, Interactive, Previewable {
     }
 
     public void updateCollectorInfo() {
-        this.nTargetFiles = FileFinder.count(this.selectedDir, this.filePattern);
+        this.nTargetFiles = Filer.getFiles(this.selectedDir, this.filePattern).size();
         setTargetMessage();
     }
 
