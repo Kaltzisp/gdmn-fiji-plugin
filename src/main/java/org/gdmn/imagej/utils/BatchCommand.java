@@ -41,15 +41,15 @@ public class BatchCommand implements Command, Interactive, Previewable {
 
     
     public void run() {
-        IJ.log("Running");
+        // Do nothing.
     }
 
     public void preview() {
-        IJ.log("Previewing");
+        // Do Nothing.
     }
 
     public void cancel() {
-        IJ.log("Cancelled");
+        IJ.log("Operation cancelled.");
     }
 
     public void updateCollectorInfo() {
