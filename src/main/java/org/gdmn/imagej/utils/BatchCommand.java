@@ -5,6 +5,11 @@ import org.scijava.command.Interactive;
 import org.scijava.command.Previewable;
 
 import org.scijava.plugin.Parameter;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.scijava.ItemVisibility;
 import org.scijava.widget.Button;
 
@@ -24,6 +29,9 @@ public class BatchCommand implements Command, Interactive, Previewable {
 
     @Parameter(label = "Browse...", callback = "selectDir")
     private Button selectDir;
+
+    @Parameter(label = "Open in File Explorer...", callback = "openDir")
+    private Button openDir;
 
     @Parameter(label = "File pattern:", callback = "updateCollectorInfo")
     public String filePattern = this.defaultFilePattern;
@@ -47,6 +55,16 @@ public class BatchCommand implements Command, Interactive, Previewable {
     public void updateCollectorInfo() {
         this.nTargetFiles = Filer.getFiles(this.selectedDir, this.filePattern).size();
         setTargetMessage();
+    }
+
+    public void openDir() {
+        Path dirPath = Paths.get(selectedDir);
+        String[] array = {"explorer.exe", dirPath.toString()};
+        try {
+            Runtime.getRuntime().exec(array);
+        } catch(IOException e) {
+            IJ.log(e.getMessage());
+        }
     }
 
     public void selectDir() {
