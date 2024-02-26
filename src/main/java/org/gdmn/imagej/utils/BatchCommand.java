@@ -30,7 +30,7 @@ public class BatchCommand implements Command, Interactive, Previewable {
     @Parameter(label = "Browse...", callback = "selectDir")
     private Button selectDir;
 
-    @Parameter(label = "Open in File Explorer...", callback = "openDir")
+    @Parameter(label = "Open in File Explorer", callback = "openDir")
     private Button openDir;
 
     @Parameter(label = "File pattern:", callback = "updateCollectorInfo")
