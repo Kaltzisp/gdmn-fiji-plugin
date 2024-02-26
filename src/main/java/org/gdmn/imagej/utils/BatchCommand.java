@@ -18,7 +18,7 @@ import ij.io.DirectoryChooser;
 
 public class BatchCommand implements Command, Interactive, Previewable {
     private String defaultFilePattern = "roi.tif";
-    private String defaultDir = org.gdmn.imagej.utils.Defaults.get("dir");
+    private String defaultDir = org.gdmn.imagej.utils.Defaults.get("dir", "");
     private int nTargetFiles = Filer.getFiles(this.defaultDir, this.defaultFilePattern).size();
 
     @Parameter(visibility = ItemVisibility.MESSAGE)

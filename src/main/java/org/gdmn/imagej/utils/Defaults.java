@@ -12,7 +12,7 @@ import java.util.List;
 public class Defaults {
     static Path defaultsPath = Paths.get(ij.Menus.getPlugInsPath(), "GdMN Plugin", ".defaults");
 
-    public static String get(String key) {
+    public static String get(String key, String fallback) {
         if (!Defaults.hasDefaultsFile()) {
             return "";
         }
@@ -26,7 +26,7 @@ public class Defaults {
         } catch (IOException e) {
             System.out.println(e);
         }
-        return "";
+        return fallback;
     }
 
     public static void set(String key, String value) {
