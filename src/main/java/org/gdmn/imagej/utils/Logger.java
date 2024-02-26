@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 
 import ij.IJ;
 
-public class Log {
+public class Logger {
     public static void logProcess(BatchCommand instance) {
 
         // Setting up log text.
