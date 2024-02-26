@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import ij.IJ;
+
 public class Defaults {
     static Path defaultsPath = Paths.get(ij.Menus.getPlugInsPath(), "GdMN Plugin", ".defaults");
 
@@ -24,7 +26,7 @@ public class Defaults {
                 }
             }
         } catch (IOException e) {
-            System.out.println(e);
+            IJ.log(e.getMessage());
         }
         return fallback;
     }
@@ -34,21 +36,26 @@ public class Defaults {
             try {
                 Files.write(defaultsPath, Collections.singleton(key + "=" + value));
             } catch (IOException e) {
-                System.err.println(e);
+                IJ.log(e.getMessage());
             }
         } else {
             try {
                 List<String> lines = Files.readAllLines(defaultsPath);
                 List<String> modifiedLines = new ArrayList<>();
+                Boolean stored = false;
                 for (String store : lines) {
                     if (key.equals(store.split("=")[0])) {
                         store = key + "=" + value;
+                        stored = true;
                     }
                     modifiedLines.add(store);
                 }
+                if (!stored) {
+                    modifiedLines.add(key + "=" + value);
+                }
                 Files.write(defaultsPath, modifiedLines);
             } catch (IOException e) {
-                e.printStackTrace();
+                IJ.log(e.getMessage());
             }
         }
     }
