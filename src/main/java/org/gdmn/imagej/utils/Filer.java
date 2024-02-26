@@ -23,7 +23,6 @@ public class Filer {
                     .filter(path -> path.getFileName().toString().equals(pattern))
                     .forEach(path -> pathList.add(path.toString()));
         } catch (IOException e) {
-            System.out.println(e);
             return Collections.emptyList();
         }
         return pathList;
