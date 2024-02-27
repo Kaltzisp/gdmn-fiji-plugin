@@ -25,9 +25,11 @@ public class Logger {
             fields[i].setAccessible(true);
             String fieldName = fields[i].getName();
             try {
-                String fieldValue = fields[i].get(instance).toString();
-                logText += fieldName + "=" + fieldValue + "\n";
-                Defaults.set(fieldName, fieldValue);
+                if (fields[i].get(instance) != null) {
+                    String fieldValue = fields[i].get(instance).toString();
+                    logText += fieldName + "=" + fieldValue + "\n";
+                    Defaults.set(fieldName, fieldValue);
+                }
             } catch (IllegalAccessException e) {
                 logText += "ERR:VALUE_NOT_LOGGED";
             }
