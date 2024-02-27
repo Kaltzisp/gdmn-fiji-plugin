@@ -59,7 +59,7 @@ public abstract class BatchCommand implements Command, Interactive, Previewable 
 
     public void openDir() {
         Path dirPath = Paths.get(selectedDir);
-        String[] array = { "explorer.exe", dirPath.toString() };
+        String[] array = {"explorer.exe", dirPath.toString()};
         try {
             Runtime.getRuntime().exec(array);
         } catch (IOException e) {
@@ -95,13 +95,13 @@ public abstract class BatchCommand implements Command, Interactive, Previewable 
     public void runAll() {
         BatchCommand self = this;
         Logger.logProcess(this);
-        List<String> filePaths = Filer.getFiles(this.selectedDir, this.filePattern);
-        int n = filePaths.size();
+        List<String> roiPaths = Filer.getFiles(this.selectedDir, this.filePattern);
+        int n = roiPaths.size();
         Thread runThread = new Thread(new Runnable() {
             public void run() {
                 for (int i = 0; i < n; i++) {
                     IJ.showStatus("!Processing image " + (i + 1) + " of " + n + ".");
-                    self.process(filePaths.get(i));
+                    self.process(roiPaths.get(i));
                 }
                 IJ.showStatus("!Command finished: " + self.getClass().getSimpleName());
             }
@@ -109,6 +109,6 @@ public abstract class BatchCommand implements Command, Interactive, Previewable 
         runThread.start();
     }
 
-    public abstract void process(String filePath);
+    public abstract void process(String roiPath);
 
 }

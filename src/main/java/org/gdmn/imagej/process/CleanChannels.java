@@ -27,16 +27,16 @@ public class CleanChannels extends BatchCommand {
     @Parameter(visibility = ItemVisibility.MESSAGE)
     private String maskMessage = "<h2 style='width: 500px'>Clean channels</h2>";
 
-    @Parameter(label = "Channel 1", choices = { "myo", "endo", "marker", "nuclei", "-" })
+    @Parameter(label = "Channel 1", choices = {"myo", "endo", "marker", "nuclei", "-"})
     private String channel1 = Defaults.get("channel1", "myo");
 
-    @Parameter(label = "Channel 2", choices = { "myo", "endo", "marker", "nuclei", "-" })
+    @Parameter(label = "Channel 2", choices = {"myo", "endo", "marker", "nuclei", "-"})
     private String channel2 = Defaults.get("channel2", "endo");
 
-    @Parameter(label = "Channel 3", choices = { "myo", "endo", "marker", "nuclei", "-" })
+    @Parameter(label = "Channel 3", choices = {"myo", "endo", "marker", "nuclei", "-"})
     private String channel3 = Defaults.get("channel3", "marker");
 
-    @Parameter(label = "Channel 4", choices = { "myo", "endo", "marker", "nuclei", "-" })
+    @Parameter(label = "Channel 4", choices = {"myo", "endo", "marker", "nuclei", "-"})
     private String channel4 = Defaults.get("channel4", "nuclei");
 
     @Parameter(label = "Crosstalk suppression", style = NumberWidget.SLIDER_STYLE, min = "0", max = "10", stepSize = "0.1")
@@ -45,9 +45,9 @@ public class CleanChannels extends BatchCommand {
     @Parameter(label = "Run", callback = "runAll")
     private Button runButton;
 
-    public void process(String filePath) {
+    public void process(String roiPath) {
 
-        ImagePlus imp = new ImagePlus(filePath);
+        ImagePlus imp = new ImagePlus(roiPath);
 
         // Converting to grayscale.
         ImageConverter ic = new ImageConverter(imp);
@@ -90,7 +90,7 @@ public class CleanChannels extends BatchCommand {
             if (endoImp != null) {
                 nucleiImp = passClean(nucleiImp, endoImp);
             }
-            Filer.save(nucleiImp, filePath, "channels", "nuclei.tif");
+            Filer.save(nucleiImp, roiPath, "channels", "nuclei.tif");
             nucleiImp.close();
         }
 
@@ -99,11 +99,11 @@ public class CleanChannels extends BatchCommand {
             ImagePlus endoSuppressed = endoImp.duplicate();
             endoSuppressed.getProcessor().multiply(crosstalkSuppression);
             ImagePlus cleanedMyo = ImageCalculator.run(myoImp, endoSuppressed, "subtract create");
-            Filer.save(cleanedMyo, filePath, "channels", "myo.tif");
+            Filer.save(cleanedMyo, roiPath, "channels", "myo.tif");
             endoSuppressed.close();
             cleanedMyo.close();
             ImagePlus cleanedEndo = ImageCalculator.run(endoImp, myoImp, "subtract create");
-            Filer.save(cleanedEndo, filePath, "channels", "endo.tif");
+            Filer.save(cleanedEndo, roiPath, "channels", "endo.tif");
             myoImp.close();
             endoImp.close();
             cleanedEndo.close();
@@ -111,7 +111,7 @@ public class CleanChannels extends BatchCommand {
 
         // Saving marker channel.
         if (markerImp != null) {
-            Filer.save(markerImp, filePath, "channels", "marker.tif");
+            Filer.save(markerImp, roiPath, "channels", "marker.tif");
             markerImp.close();
         }
     }
