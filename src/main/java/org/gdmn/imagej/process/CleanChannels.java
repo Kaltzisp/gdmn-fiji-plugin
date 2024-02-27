@@ -25,7 +25,7 @@ import inra.ijpb.morphology.Strel;
 public class CleanChannels extends BatchCommand {
 
     @Parameter(visibility = ItemVisibility.MESSAGE)
-    private String maskMessage = "<h2 style='width: 500px'>Clean channels</h2>";
+    private String header = "<h2 style='width: 500px'>Clean channels</h2>";
 
     @Parameter(label = "Channel 1", choices = { "myo", "endo", "marker", "nuclei", "-" })
     private String channel1 = Defaults.get("channel1", "myo");

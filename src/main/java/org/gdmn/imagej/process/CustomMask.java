@@ -18,7 +18,7 @@ import ij.gui.WaitForUserDialog;
 public class CustomMask extends BatchCommand {
 
     @Parameter(visibility = ItemVisibility.MESSAGE)
-    private String maskMessage = "<h2 style='width: 500px'>Create custom mask</h2>";
+    private String header = "<h2 style='width: 500px'>Create custom mask</h2>";
 
     @Parameter(label = "Template type", choices = { "Entire ROI", "Channel",
             "Mask" }, callback = "updateTemplateTissues")

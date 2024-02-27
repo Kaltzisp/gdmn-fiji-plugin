@@ -23,7 +23,7 @@ import inra.ijpb.morphology.Strel;
 public class CreateMask extends BatchCommand {
 
     @Parameter(visibility = ItemVisibility.MESSAGE)
-    private String maskMessage = "<h2 style='width: 500px'>Create tissue masks</h2>";
+    private String header = "<h2 style='width: 500px'>Create tissue masks</h2>";
 
     @Parameter(label = "Channel", choices = {"myo", "endo", "marker", "nuclei"})
     private String channelType = Defaults.get("channelType", "myo");
