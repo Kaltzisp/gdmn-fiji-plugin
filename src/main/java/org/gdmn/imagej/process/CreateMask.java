@@ -41,7 +41,7 @@ public class CreateMask extends BatchCommand {
     private Button runButton;
 
     public void process(String roiPath) {
-        String filePath = Filer.getDir(roiPath, "channels", this.channelType + ".tif");
+        String filePath = Filer.getPath(roiPath, "channels", this.channelType + ".tif");
         ImagePlus imp = new ImagePlus(filePath);
         ImageProcessor ip = imp.getProcessor();
 
