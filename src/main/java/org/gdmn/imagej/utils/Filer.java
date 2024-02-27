@@ -39,4 +39,9 @@ public class Filer {
         IJ.save(imp, savePath);
     }
 
+    public static String getDir(String roiPath, String folder, String imageName) {
+        String dirPath = Paths.get(roiPath).getParent().toString();
+        return Paths.get(dirPath, folder, imageName).toString();
+    }
+
 }
