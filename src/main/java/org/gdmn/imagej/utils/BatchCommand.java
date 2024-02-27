@@ -100,10 +100,10 @@ public abstract class BatchCommand implements Command, Interactive, Previewable 
         Thread runThread = new Thread(new Runnable() {
             public void run() {
                 for (int i = 0; i < n; i++) {
-                    IJ.showStatus("!Running on " + i + " of " + n + ".");
+                    IJ.showStatus("!Processing image " + (i + 1) + " of " + n + ".");
                     self.process(filePaths.get(i));
                 }
-
+                IJ.showStatus("!Command finished: " + self.getClass().getSimpleName());
             }
         });
         runThread.start();
