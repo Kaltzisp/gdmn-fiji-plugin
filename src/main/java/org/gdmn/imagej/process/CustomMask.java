@@ -34,16 +34,16 @@ public class CustomMask extends BatchCommand {
     private Button runButton;
 
     public void updateTemplateTissues() {
-        if (this.templateType == "Entire ROI") {
+        if (this.templateType.equals("Entire ROI")) {
             this.templateTissue = "-";
         }
     }
 
     public void process(String roiPath) {
         String filePath = roiPath;
-        if (this.templateType == "Channel" && templateTissue != "-") {
+        if (this.templateType.equals("Channel") && templateTissue != "-") {
             filePath = Filer.getPath(roiPath, "channels", this.templateTissue + ".tif");
-        } else if (this.templateType == "Mask" && templateTissue != "-") {
+        } else if (this.templateType.equals("Mask") && templateTissue != "-") {
             filePath = Filer.getPath(roiPath, "masks", "mask_" + this.templateTissue + ".tif");
         }
 
