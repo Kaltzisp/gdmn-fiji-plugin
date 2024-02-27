@@ -19,8 +19,8 @@ import ij.process.ImageProcessor;
 import inra.ijpb.morphology.Morphology;
 import inra.ijpb.morphology.Strel;
 
-@Plugin(type = Command.class, menuPath = "2D Macro Tool>Create Masks")
-public class CreateMasks extends BatchCommand {
+@Plugin(type = Command.class, menuPath = "2D Macro Tool>Create Mask")
+public class CreateMask extends BatchCommand {
 
     @Parameter(visibility = ItemVisibility.MESSAGE)
     private String maskMessage = "<h2 style='width: 500px'>Create tissue masks</h2>";
