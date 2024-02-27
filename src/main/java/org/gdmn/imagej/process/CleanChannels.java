@@ -7,7 +7,6 @@ import java.util.List;
 import org.gdmn.imagej.utils.BatchCommand;
 import org.gdmn.imagej.utils.Defaults;
 import org.gdmn.imagej.utils.Filer;
-import org.gdmn.imagej.utils.Logger;
 import org.scijava.ItemVisibility;
 import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
@@ -43,80 +42,78 @@ public class CleanChannels extends BatchCommand {
     @Parameter(label = "Crosstalk suppression", style = NumberWidget.SLIDER_STYLE, min = "0", max = "10", stepSize = "0.1")
     private double crosstalkSuppression = 1;
 
-    @Parameter(label = "Run", callback = "execute")
+    @Parameter(label = "Run", callback = "runAll")
     private Button runButton;
 
-    public void execute() {
-        Logger.logProcess(this);
-        List<String> filePaths = Filer.getFiles(this.selectedDir, this.filePattern);
-        for (String filePath : filePaths) {
-            ImagePlus imp = new ImagePlus(filePath);
-            ImageConverter ic = new ImageConverter(imp);
-            ic.convertToGray8();
+    public void process(String filePath) {
 
-            // Declarations.
-            ImagePlus myoImp = null;
-            ImagePlus endoImp = null;
-            ImagePlus markerImp = null;
-            ImagePlus nucleiImp = null;
+        ImagePlus imp = new ImagePlus(filePath);
 
-            // Splitting image.
-            ImagePlus[] imps = ChannelSplitter.split(imp);
-            List<String> channels = new ArrayList<>(Arrays.asList(channel1, channel2, channel3, channel4));
-            int myoIndex = channels.indexOf("myo");
-            int endoIndex = channels.indexOf("endo");
-            int markerIndex = channels.indexOf("marker");
-            int nucleiIndex = channels.indexOf("nuclei");
-            imp.close();
+        // Converting to grayscale.
+        ImageConverter ic = new ImageConverter(imp);
+        ic.convertToGray8();
 
-            // Assigning channels.
-            if (myoIndex >= 0) {
-                myoImp = imps[myoIndex];
-            }
-            if (endoIndex >= 0) {
-                endoImp = imps[endoIndex];
-            }
-            if (markerIndex >= 0) {
-                markerImp = imps[markerIndex];
-            }
-            if (nucleiIndex >= 0) {
-                nucleiImp = imps[nucleiIndex];
-            }
+        // Declarations.
+        ImagePlus myoImp = null;
+        ImagePlus endoImp = null;
+        ImagePlus markerImp = null;
+        ImagePlus nucleiImp = null;
 
-            // Cleaning nuclear channel.
-            if (nucleiImp != null) {
-                if (myoImp != null) {
-                    nucleiImp = passClean(nucleiImp, myoImp);
-                }
-                if (endoImp != null) {
-                    nucleiImp = passClean(nucleiImp, endoImp);
-                }
-                Filer.save(nucleiImp, filePath, "channels", "nuclei.tif");
-                nucleiImp.close();
-            }
+        // Splitting image.
+        ImagePlus[] imps = ChannelSplitter.split(imp);
+        List<String> channels = new ArrayList<>(Arrays.asList(channel1, channel2, channel3, channel4));
+        int myoIndex = channels.indexOf("myo");
+        int endoIndex = channels.indexOf("endo");
+        int markerIndex = channels.indexOf("marker");
+        int nucleiIndex = channels.indexOf("nuclei");
+        imp.close();
 
-            // Cleaning myo and endo channels.
-            if (myoImp != null && endoImp != null) {
-                ImagePlus endoSuppressed = endoImp.duplicate();
-                endoSuppressed.getProcessor().multiply(crosstalkSuppression);
-                ImagePlus cleanedMyo = ImageCalculator.run(myoImp, endoSuppressed, "subtract create");
-                Filer.save(cleanedMyo, filePath, "channels", "myo.tif");
-                endoSuppressed.close();
-                cleanedMyo.close();
-                ImagePlus cleanedEndo = ImageCalculator.run(endoImp, myoImp, "subtract create");
-                Filer.save(cleanedEndo, filePath, "channels", "endo.tif");
-                myoImp.close();
-                endoImp.close();
-                cleanedEndo.close();
-            }
-
-            // Saving marker channel.
-            if (markerImp != null) {
-                Filer.save(markerImp, filePath, "channels", "marker.tif");
-                markerImp.close();
-            }
+        // Assigning channels.
+        if (myoIndex >= 0) {
+            myoImp = imps[myoIndex];
+        }
+        if (endoIndex >= 0) {
+            endoImp = imps[endoIndex];
+        }
+        if (markerIndex >= 0) {
+            markerImp = imps[markerIndex];
+        }
+        if (nucleiIndex >= 0) {
+            nucleiImp = imps[nucleiIndex];
         }
 
+        // Cleaning nuclear channel.
+        if (nucleiImp != null) {
+            if (myoImp != null) {
+                nucleiImp = passClean(nucleiImp, myoImp);
+            }
+            if (endoImp != null) {
+                nucleiImp = passClean(nucleiImp, endoImp);
+            }
+            Filer.save(nucleiImp, filePath, "channels", "nuclei.tif");
+            nucleiImp.close();
+        }
+
+        // Cleaning myo and endo channels.
+        if (myoImp != null && endoImp != null) {
+            ImagePlus endoSuppressed = endoImp.duplicate();
+            endoSuppressed.getProcessor().multiply(crosstalkSuppression);
+            ImagePlus cleanedMyo = ImageCalculator.run(myoImp, endoSuppressed, "subtract create");
+            Filer.save(cleanedMyo, filePath, "channels", "myo.tif");
+            endoSuppressed.close();
+            cleanedMyo.close();
+            ImagePlus cleanedEndo = ImageCalculator.run(endoImp, myoImp, "subtract create");
+            Filer.save(cleanedEndo, filePath, "channels", "endo.tif");
+            myoImp.close();
+            endoImp.close();
+            cleanedEndo.close();
+        }
+
+        // Saving marker channel.
+        if (markerImp != null) {
+            Filer.save(markerImp, filePath, "channels", "marker.tif");
+            markerImp.close();
+        }
     }
 
     private ImagePlus passClean(ImagePlus baseImage, ImagePlus passImage) {

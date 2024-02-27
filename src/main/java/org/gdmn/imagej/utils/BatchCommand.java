@@ -9,6 +9,7 @@ import org.scijava.plugin.Parameter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.scijava.ItemVisibility;
 import org.scijava.widget.Button;
@@ -16,7 +17,7 @@ import org.scijava.widget.Button;
 import ij.IJ;
 import ij.io.DirectoryChooser;
 
-public class BatchCommand implements Command, Interactive, Previewable {
+public abstract class BatchCommand implements Command, Interactive, Previewable {
     private String defaultFilePattern = "roi.tif";
     private String defaultDir = org.gdmn.imagej.utils.Defaults.get("dir", "");
     private int nTargetFiles = Filer.getFiles(this.defaultDir, this.defaultFilePattern).size();
@@ -39,7 +40,6 @@ public class BatchCommand implements Command, Interactive, Previewable {
     @Parameter(visibility = ItemVisibility.MESSAGE)
     private String targetMessage = setTargetMessage();
 
-    
     public void run() {
         // Do nothing.
     }
@@ -59,10 +59,10 @@ public class BatchCommand implements Command, Interactive, Previewable {
 
     public void openDir() {
         Path dirPath = Paths.get(selectedDir);
-        String[] array = {"explorer.exe", dirPath.toString()};
+        String[] array = { "explorer.exe", dirPath.toString() };
         try {
             Runtime.getRuntime().exec(array);
-        } catch(IOException e) {
+        } catch (IOException e) {
             IJ.log(e.getMessage());
         }
     }
@@ -78,10 +78,12 @@ public class BatchCommand implements Command, Interactive, Previewable {
     }
 
     private String setTargetMessage() {
-        if (this.nTargetFiles > 1 ) {
-            this.targetMessage = "<p style='color:#006600'>ImageJ has identified " + this.nTargetFiles + " images which match these parameters.</p>";
+        if (this.nTargetFiles > 1) {
+            this.targetMessage = "<p style='color:#006600'>ImageJ has identified " + this.nTargetFiles
+                    + " images which match these parameters.</p>";
         } else if (this.nTargetFiles == 1) {
-            this.targetMessage = "<p style='color:#006600'>ImageJ has identified " + this.nTargetFiles + " image which matches these parameters.</p>";
+            this.targetMessage = "<p style='color:#006600'>ImageJ has identified " + this.nTargetFiles
+                    + " image which matches these parameters.</p>";
         } else if (this.nTargetFiles == 0) {
             this.targetMessage = "<p style='color:#bb0000'>No matching images found.</p>";
         } else {
@@ -89,5 +91,24 @@ public class BatchCommand implements Command, Interactive, Previewable {
         }
         return this.targetMessage;
     }
+
+    public void runAll() {
+        BatchCommand self = this;
+        Logger.logProcess(this);
+        List<String> filePaths = Filer.getFiles(this.selectedDir, this.filePattern);
+        int n = filePaths.size();
+        Thread runThread = new Thread(new Runnable() {
+            public void run() {
+                for (int i = 0; i < n; i++) {
+                    IJ.showStatus("!Running on " + i + " of " + n + ".");
+                    self.process(filePaths.get(i));
+                }
+
+            }
+        });
+        runThread.start();
+    }
+
+    public abstract void process(String filePath);
 
 }
