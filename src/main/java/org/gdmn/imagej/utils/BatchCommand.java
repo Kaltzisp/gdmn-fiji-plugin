@@ -60,7 +60,6 @@ public abstract class BatchCommand implements Command, Interactive, Previewable 
     }
 
     public void updateCollectorInfo() {
-        IJ.log("Updating");
         this.nTargetFiles = Filer.getFiles(this.selectedDir, this.filePattern).size();
         this.targetMessage = setTargetMessage();
     }
