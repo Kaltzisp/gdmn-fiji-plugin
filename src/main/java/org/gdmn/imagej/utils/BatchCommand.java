@@ -18,15 +18,12 @@ import ij.IJ;
 import ij.io.DirectoryChooser;
 
 public abstract class BatchCommand implements Command, Interactive, Previewable {
-    private String defaultFilePattern = "roi.tif";
-    private String defaultDir = org.gdmn.imagej.utils.Defaults.get("dir", "");
-    private int nTargetFiles = Filer.getFiles(this.defaultDir, this.defaultFilePattern).size();
 
     @Parameter(visibility = ItemVisibility.MESSAGE)
     private String fileChooserMessage = "<h2 style='width: 500px'>Select the parent directory and target file pattern.</h2>";
 
     @Parameter(label = "Parent directory:", callback = "updateCollectorInfo")
-    public String selectedDir = this.defaultDir;
+    public String selectedDir = Defaults.get("dir", "");
 
     @Parameter(label = "Browse...", callback = "selectDir")
     private Button selectDir;
@@ -35,37 +32,12 @@ public abstract class BatchCommand implements Command, Interactive, Previewable 
     private Button openDir;
 
     @Parameter(label = "File pattern:", callback = "updateCollectorInfo")
-    public String filePattern = this.defaultFilePattern;
+    public String filePattern = Defaults.get("filePattern", "roi.tif");
+    
+    private int nTargetFiles = Filer.getFiles(this.selectedDir, this.filePattern).size();
 
     @Parameter(visibility = ItemVisibility.MESSAGE)
     private String targetMessage = setTargetMessage();
-
-    public void run() {
-        // Do nothing.
-    }
-
-    public void preview() {
-        // Do Nothing.
-    }
-
-    public void cancel() {
-        IJ.log("Operation cancelled.");
-    }
-
-    public void updateCollectorInfo() {
-        this.nTargetFiles = Filer.getFiles(this.selectedDir, this.filePattern).size();
-        setTargetMessage();
-    }
-
-    public void openDir() {
-        Path dirPath = Paths.get(selectedDir);
-        String[] array = {"explorer.exe", dirPath.toString()};
-        try {
-            Runtime.getRuntime().exec(array);
-        } catch (IOException e) {
-            IJ.log(e.getMessage());
-        }
-    }
 
     public void selectDir() {
         DirectoryChooser.setDefaultDirectory(this.selectedDir);
@@ -77,20 +49,39 @@ public abstract class BatchCommand implements Command, Interactive, Previewable 
         }
     }
 
+    public void openDir() {
+        Path dirPath = Paths.get(this.selectedDir);
+        String[] array = { "explorer.exe", dirPath.toString() };
+        try {
+            Runtime.getRuntime().exec(array);
+        } catch (IOException e) {
+            IJ.log(e.getMessage());
+        }
+    }
+
+    public void updateCollectorInfo() {
+        IJ.log("Updating");
+        this.nTargetFiles = Filer.getFiles(this.selectedDir, this.filePattern).size();
+        this.targetMessage = setTargetMessage();
+    }
+
     private String setTargetMessage() {
+        String message = "";
         if (this.nTargetFiles > 1) {
-            this.targetMessage = "<p style='color:#006600'>ImageJ has identified " + this.nTargetFiles
+            message = "<p style='color:#006600'>ImageJ has identified " + this.nTargetFiles
                     + " images which match these parameters.</p>";
         } else if (this.nTargetFiles == 1) {
-            this.targetMessage = "<p style='color:#006600'>ImageJ has identified " + this.nTargetFiles
+            message = "<p style='color:#006600'>ImageJ has identified " + this.nTargetFiles
                     + " image which matches these parameters.</p>";
         } else if (this.nTargetFiles == 0) {
-            this.targetMessage = "<p style='color:#bb0000'>No matching images found.</p>";
+            message = "<p style='color:#bb0000'>No matching images found.</p>";
         } else {
-            this.targetMessage = "<p style='color:#bb0000'>An error occurred.</p>";
+            message = "<p style='color:#bb0000'>An error occurred.</p>";
         }
-        return this.targetMessage;
+        return message;
     }
+
+    public abstract void process(String roiPath);
 
     public void runAll() {
         BatchCommand self = this;
@@ -109,6 +100,16 @@ public abstract class BatchCommand implements Command, Interactive, Previewable 
         runThread.start();
     }
 
-    public abstract void process(String roiPath);
+    public void run() {
+        // Do nothing.
+    }
+
+    public void preview() {
+        // Do nothing.
+    }
+
+    public void cancel() {
+        // Do nothing.
+    }
 
 }

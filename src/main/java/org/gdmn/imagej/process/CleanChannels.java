@@ -27,16 +27,16 @@ public class CleanChannels extends BatchCommand {
     @Parameter(visibility = ItemVisibility.MESSAGE)
     private String maskMessage = "<h2 style='width: 500px'>Clean channels</h2>";
 
-    @Parameter(label = "Channel 1", choices = {"myo", "endo", "marker", "nuclei", "-"})
+    @Parameter(label = "Channel 1", choices = { "myo", "endo", "marker", "nuclei", "-" })
     private String channel1 = Defaults.get("channel1", "myo");
 
-    @Parameter(label = "Channel 2", choices = {"myo", "endo", "marker", "nuclei", "-"})
+    @Parameter(label = "Channel 2", choices = { "myo", "endo", "marker", "nuclei", "-" })
     private String channel2 = Defaults.get("channel2", "endo");
 
-    @Parameter(label = "Channel 3", choices = {"myo", "endo", "marker", "nuclei", "-"})
+    @Parameter(label = "Channel 3", choices = { "myo", "endo", "marker", "nuclei", "-" })
     private String channel3 = Defaults.get("channel3", "marker");
 
-    @Parameter(label = "Channel 4", choices = {"myo", "endo", "marker", "nuclei", "-"})
+    @Parameter(label = "Channel 4", choices = { "myo", "endo", "marker", "nuclei", "-" })
     private String channel4 = Defaults.get("channel4", "nuclei");
 
     @Parameter(label = "Crosstalk suppression", style = NumberWidget.SLIDER_STYLE, min = "0", max = "10", stepSize = "0.1")
