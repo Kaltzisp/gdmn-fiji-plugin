@@ -1,6 +1,7 @@
 package org.gdmn.imagej.process;
 
 import org.gdmn.imagej.utils.BatchCommand;
+import org.gdmn.imagej.utils.Defaults;
 import org.gdmn.imagej.utils.Filer;
 import org.scijava.command.Command;
 import org.scijava.plugin.Plugin;
@@ -8,7 +9,6 @@ import org.scijava.plugin.Plugin;
 import org.scijava.plugin.Parameter;
 import org.scijava.ItemVisibility;
 import org.scijava.widget.Button;
-import org.scijava.widget.NumberWidget;
 
 import ij.ImagePlus;
 import ij.gui.Roi;
@@ -25,46 +25,40 @@ public class Masks extends BatchCommand {
     @Parameter(visibility = ItemVisibility.MESSAGE)
     private String maskMessage = "<h2 style='width: 500px'>Create tissue masks</h2>";
 
-    @Parameter(label = "Channel", style = NumberWidget.SLIDER_STYLE, min = "1", max = "4", stepSize = "1")
-    private int channelIndex;
+    @Parameter(label = "Channel", choices = {"myo", "endo", "marker", "nuclei"})
+    private String channelType = Defaults.get("channelType", "myo");
 
     @Parameter(label = "Multiplier:")
-    private float multiplier = 2;
+    private float multiplier = Float.parseFloat(Defaults.get("multiplier", "2"));
 
     @Parameter(label = "Median radius:")
-    private float medianRadius = 6;
+    private float medianRadius = Float.parseFloat(Defaults.get("medianRadius", "6"));
 
     @Parameter(label = "Closing radius:")
-    private int closingRadius = 2;
+    private int closingRadius = Integer.parseInt(Defaults.get("closingRadius", "2"));
 
-    @Parameter(label = "Output filename")
-    private String outputFile = "mask_myo.tif";
-
-    @Parameter(label = "Run", callback = "execute")
+    @Parameter(label = "Run", callback = "runAll")
     private Button runButton;
 
-    public void process(String filePath) {
+    public void process(String roiPath) {
+        String filePath = Filer.getDir(roiPath, "channels", this.channelType + ".tif");
         ImagePlus imp = new ImagePlus(filePath);
-        imp.setSlice(channelIndex);
         ImageProcessor ip = imp.getProcessor();
 
         // Creating mask.
-        ip.multiply(multiplier);
-        new RankFilters().rank(ip, medianRadius, RankFilters.MEDIAN);
-        ip = Morphology.closing(ip, Strel.Shape.DISK.fromRadius(closingRadius));
+        ip.multiply(this.multiplier);
+        new RankFilters().rank(ip, this.medianRadius, RankFilters.MEDIAN);
+        ip = Morphology.closing(ip, Strel.Shape.DISK.fromRadius(this.closingRadius));
         ip.autoThreshold();
-
-        // Creating single channel image.
-        ImagePlus slice = new ImagePlus("slice", ip);
-        imp.close();
+        imp.setProcessor(ip);
 
         // Drawing selection.
         ip.setThreshold(255, 255, ImageProcessor.NO_LUT_UPDATE);
-        Roi roi = ThresholdToSelection.run(slice);
-        slice.setRoi(roi);
+        Roi roi = ThresholdToSelection.run(imp);
+        imp.setRoi(roi);
 
         // Saving mask.
-        Filer.save(slice, filePath, "masks", outputFile);
+        Filer.save(imp, roiPath, "masks", "mask_" + this.channelType + ".tif");
         imp.close();
     }
 
