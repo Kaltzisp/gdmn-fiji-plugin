@@ -2,8 +2,6 @@ package org.gdmn.imagej.utils;
 
 import org.scijava.command.Command;
 import org.scijava.command.Interactive;
-import org.scijava.command.Previewable;
-
 import org.scijava.plugin.Parameter;
 
 import java.io.IOException;
@@ -17,12 +15,12 @@ import org.scijava.widget.Button;
 import ij.IJ;
 import ij.io.DirectoryChooser;
 
-public abstract class BatchCommand implements Command, Interactive, Previewable {
+public abstract class BatchCommand implements Command, Interactive {
 
     @Parameter(visibility = ItemVisibility.MESSAGE)
     private String fileChooserMessage = "<h2 style='width: 500px'>Select the parent directory and target file pattern.</h2>";
 
-    @Parameter(label = "Parent directory:", callback = "updateCollectorInfo")
+    @Parameter(label = "Parent directory:", persist = false, callback = "updateCollectorInfo")
     public String selectedDir = Defaults.get("dir", "");
 
     @Parameter(label = "Browse...", callback = "selectDir")
@@ -31,12 +29,12 @@ public abstract class BatchCommand implements Command, Interactive, Previewable 
     @Parameter(label = "Open in File Explorer", callback = "openDir")
     private Button openDir;
 
-    @Parameter(label = "File pattern:", callback = "updateCollectorInfo")
+    @Parameter(label = "File pattern:", persist = false, callback = "updateCollectorInfo")
     public String filePattern = Defaults.get("filePattern", "roi.tif");
     
     private int nTargetFiles = Filer.getFiles(this.selectedDir, this.filePattern).size();
 
-    @Parameter(visibility = ItemVisibility.MESSAGE)
+    @Parameter(visibility = ItemVisibility.MESSAGE, persist = false)
     private String targetMessage = setTargetMessage();
 
     public void selectDir() {
