@@ -15,18 +15,17 @@ public class Defaults {
     static Path defaultsPath = Paths.get(ij.Menus.getPlugInsPath(), "GdMN Plugin", ".defaults");
 
     public static String get(String key, String fallback) {
-        if (!Defaults.hasDefaultsFile()) {
-            return "";
-        }
-        try {
-            List<String> lines = Files.readAllLines(defaultsPath);
-            for (String store : lines) {
-                if (key.equals(store.split("=")[0])) {
-                    return store.split("=")[1];
+        if (Defaults.hasDefaultsFile()) {
+            try {
+                List<String> lines = Files.readAllLines(defaultsPath);
+                for (String store : lines) {
+                    if (key.equals(store.split("=")[0])) {
+                        return store.split("=")[1];
+                    }
                 }
+            } catch (IOException e) {
+                IJ.log(e.getMessage());
             }
-        } catch (IOException e) {
-            IJ.log(e.getMessage());
         }
         return fallback;
     }
@@ -50,7 +49,7 @@ public class Defaults {
                     }
                     modifiedLines.add(store);
                 }
-                if (!stored) {
+                if (!stored && value.charAt(0) != '<') {
                     modifiedLines.add(key + "=" + value);
                 }
                 Files.write(defaultsPath, modifiedLines);
