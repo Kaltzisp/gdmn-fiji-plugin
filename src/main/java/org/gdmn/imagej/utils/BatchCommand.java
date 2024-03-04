@@ -91,7 +91,7 @@ public abstract class BatchCommand implements Command, Interactive {
                     IJ.showStatus("!Processing image " + (i + 1) + " of " + n + ".");
                     self.process(roiPaths.get(i));
                 }
-                IJ.showStatus("!Command finished: " + self.getClass().getSimpleName());
+                IJ.showStatus("!Command finished: " + self.getClass().getSimpleName() + " on n=" + n + " images.");
             }
         });
         runThread.start();
