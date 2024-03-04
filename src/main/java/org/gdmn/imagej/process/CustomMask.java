@@ -17,7 +17,7 @@ import ij.gui.WaitForUserDialog;
 import ij.plugin.filter.ThresholdToSelection;
 import ij.process.ImageProcessor;
 
-@Plugin(type = Command.class, menuPath = "2D Macro Tool>Custom Mask")
+@Plugin(type = Command.class, menuPath = "2D Macro Tool>Custom Masks")
 public class CustomMask extends BatchCommand {
 
     @Parameter(visibility = ItemVisibility.MESSAGE)

@@ -19,7 +19,7 @@ import ij.process.ImageProcessor;
 import inra.ijpb.morphology.Morphology;
 import inra.ijpb.morphology.Strel;
 
-@Plugin(type = Command.class, menuPath = "2D Macro Tool>Create Mask")
+@Plugin(type = Command.class, menuPath = "2D Macro Tool>Create Masks")
 public class CreateMask extends BatchCommand {
 
     @Parameter(visibility = ItemVisibility.MESSAGE)
