@@ -29,14 +29,18 @@ public class Filer {
     }
 
     public static void save(ImagePlus imp, String roiPath, String folder, String saveName) {
+        String savePath = getSavePath(roiPath, folder, saveName);
+        IJ.save(imp, savePath);
+    }
+
+    public static String getSavePath(String roiPath, String folder, String saveName) {
         String dirPath = Paths.get(roiPath).getParent().toString();
         String saveDir = Paths.get(dirPath, folder).toString();
         File dir = new File(saveDir);
         if (!dir.exists() || !dir.isDirectory()) {
             dir.mkdir();
         }
-        String savePath = Paths.get(saveDir, saveName).toString();
-        IJ.save(imp, savePath);
+        return Paths.get(saveDir, saveName).toString();
     }
 
     public static String getPath(String roiPath, String folder, String imageName) {
