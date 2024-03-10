@@ -18,8 +18,8 @@ import ij.plugin.frame.RoiManager;
 import ij.process.ImageConverter;
 import ij.process.ImageProcessor;
 
-@Plugin(type = Command.class, menuPath = "2D Macro Tool>StarDist")
-public class BatchStardist extends BatchCommand {
+@Plugin(type = Command.class, menuPath = "2D Macro Tool>Nuclear Classification")
+public class NuclearClassification extends BatchCommand {
 
     @Parameter(visibility = ItemVisibility.MESSAGE)
     private String header = "<h2 style='width: 500px'>Batch StarDist</h2>";
