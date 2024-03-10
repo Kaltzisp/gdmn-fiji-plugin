@@ -90,7 +90,7 @@ public class BatchStardist extends BatchCommand {
 
         // If more than 255 rois convert to 16 bit first.
         rois = roiManager.getRoisAsArray();
-        if (rois.length > 100) {
+        if (rois.length > 255) {
             ImageConverter converter = new ImageConverter(imp);
             converter.convertToGray16();
         }
