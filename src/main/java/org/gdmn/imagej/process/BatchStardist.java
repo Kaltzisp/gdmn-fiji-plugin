@@ -109,7 +109,6 @@ public class BatchStardist extends BatchCommand {
         // Saving and closing.
         Filer.save(imp, roiPath, "labels", "label_roi.tif");
         roiManager.runCommand("Save", Filer.getSavePath(roiPath, "zips", "zip_roi.zip"));
-        roiManager.reset();
         roiManager.close();
         imp.close();
 
