@@ -5,6 +5,7 @@ import org.gdmn.imagej.utils.Defaults;
 import org.gdmn.imagej.utils.Filer;
 import org.scijava.ItemVisibility;
 import org.scijava.command.Command;
+import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.widget.Button;
@@ -15,7 +16,11 @@ import ij.measure.Measurements;
 import ij.plugin.RoiEnlarger;
 import ij.plugin.filter.ThresholdToSelection;
 import ij.process.ImageProcessor;
-@Plugin(type = Command.class, menuPath = "2D Macro Tool>Segment Sublayers")
+
+@Plugin(type = Command.class, label = "Segment sublayers", menu = {
+    @Menu(label = "2D Macro Tool"),
+    @Menu(label = "Segment sublayers", weight = 6)
+})
 public class SegmentSublayers extends BatchCommand {
     @Parameter(visibility = ItemVisibility.MESSAGE)
     private String header = "<h2 style='width: 500px'>Segment into sublayers</h2>";

@@ -5,6 +5,7 @@ import org.gdmn.imagej.utils.Defaults;
 import org.gdmn.imagej.utils.Filer;
 import org.scijava.ItemVisibility;
 import org.scijava.command.Command;
+import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.widget.Button;
@@ -18,7 +19,10 @@ import ij.plugin.frame.RoiManager;
 import ij.process.ImageConverter;
 import ij.process.ImageProcessor;
 
-@Plugin(type = Command.class, menuPath = "2D Macro Tool>Nuclear Classification")
+@Plugin(type = Command.class, label = "Nuclear Individualisation", menu = {
+    @Menu(label = "2D Macro Tool"),
+    @Menu(label = "Nuclear Individualisation", weight = 4)
+})
 public class NuclearClassification extends BatchCommand {
 
     @Parameter(visibility = ItemVisibility.MESSAGE)

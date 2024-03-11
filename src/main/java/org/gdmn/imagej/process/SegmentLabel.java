@@ -5,6 +5,7 @@ import org.gdmn.imagej.utils.Defaults;
 import org.gdmn.imagej.utils.Filer;
 import org.scijava.ItemVisibility;
 import org.scijava.command.Command;
+import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.widget.Button;
@@ -15,7 +16,10 @@ import ij.plugin.LutLoader;
 import ij.plugin.frame.RoiManager;
 import ij.process.ImageProcessor;
 
-@Plugin(type = Command.class, menuPath = "2D Macro Tool>Segment Labels")
+@Plugin(type = Command.class, label = "Nuclear Classification", menu = {
+    @Menu(label = "2D Macro Tool"),
+    @Menu(label = "Nuclear Classification", weight = 5)
+})
 public class SegmentLabel extends BatchCommand {
 
     @Parameter(visibility = ItemVisibility.MESSAGE)

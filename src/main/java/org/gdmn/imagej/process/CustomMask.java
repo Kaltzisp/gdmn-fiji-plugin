@@ -16,8 +16,12 @@ import ij.gui.Toolbar;
 import ij.gui.WaitForUserDialog;
 import ij.plugin.filter.ThresholdToSelection;
 import ij.process.ImageProcessor;
+import org.scijava.plugin.Menu;
 
-@Plugin(type = Command.class, menuPath = "2D Macro Tool>Custom Masks")
+@Plugin(type = Command.class, label = "Create Custom Masks", menu = {
+    @Menu(label = "2D Macro Tool"),
+    @Menu(label = "Create Custom Masks", weight = 3)
+})
 public class CustomMask extends BatchCommand {
 
     @Parameter(visibility = ItemVisibility.MESSAGE)

@@ -7,6 +7,7 @@ import org.scijava.command.Command;
 import org.scijava.plugin.Plugin;
 
 import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Menu;
 import org.scijava.ItemVisibility;
 import org.scijava.widget.Button;
 
@@ -19,7 +20,10 @@ import ij.process.ImageProcessor;
 import inra.ijpb.morphology.Morphology;
 import inra.ijpb.morphology.Strel;
 
-@Plugin(type = Command.class, menuPath = "2D Macro Tool>Create Masks")
+@Plugin(type = Command.class, label = "Create Masks", menu = {
+    @Menu(label = "2D Macro Tool"),
+    @Menu(label = "Create Masks", weight = 2)
+})
 public class CreateMask extends BatchCommand {
 
     @Parameter(visibility = ItemVisibility.MESSAGE)

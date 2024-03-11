@@ -9,6 +9,7 @@ import org.gdmn.imagej.utils.Defaults;
 import org.gdmn.imagej.utils.Filer;
 import org.scijava.ItemVisibility;
 import org.scijava.command.Command;
+import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.widget.Button;
@@ -21,7 +22,10 @@ import ij.process.ImageConverter;
 import inra.ijpb.morphology.Morphology;
 import inra.ijpb.morphology.Strel;
 
-@Plugin(type = Command.class, menuPath = "2D Macro Tool>Clean Channels")
+@Plugin(type = Command.class, label = "Clean Channels", menu = {
+    @Menu(label = "2D Macro Tool"),
+    @Menu(label = "Clean Channels", weight = 1)
+})
 public class CleanChannels extends BatchCommand {
 
     @Parameter(visibility = ItemVisibility.MESSAGE)

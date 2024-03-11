@@ -14,6 +14,7 @@ import org.gdmn.imagej.utils.Filer;
 import org.scijava.ItemVisibility;
 import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Menu;
 import org.scijava.plugin.Plugin;
 import org.scijava.widget.Button;
 
@@ -25,7 +26,11 @@ import ij.plugin.frame.RoiManager;
 import ij.process.ImageConverter;
 import ij.process.ImageProcessor;
 
-@Plugin(type = Command.class, menuPath = "2D Macro Tool>Quantify")
+
+@Plugin(type = Command.class, label = "Extract Quantifications", menu = {
+    @Menu(label = "2D Macro Tool"),
+    @Menu(label = "Extract Quantifications", weight = 7)
+})
 public class Quantify extends BatchCommand {
 
     @Parameter(visibility = ItemVisibility.MESSAGE)
