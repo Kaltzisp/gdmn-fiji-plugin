@@ -48,6 +48,11 @@ public class Filer {
         return Paths.get(dirPath, folder, imageName).toString();
     }
 
+    public static String getDir(String roiPath, String folder) {
+        String dirPath = Paths.get(roiPath).getParent().toString();
+        return Paths.get(dirPath, folder).toString();
+    }
+
     public static void delete(String roiPath, String folder, String fileName) {
         String filePath = getPath(roiPath, folder, fileName);
         File f = new File(filePath);
