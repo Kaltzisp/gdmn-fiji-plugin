@@ -44,6 +44,8 @@ public class SegmentLabel extends BatchCommand {
             segmentLabel(roiPath, "sublayer_myo_trabecular_2.tif", "tmp_middle_apex", "myo_trabecular_middle", "myo_trabecular_apex");
             segmentLabel(roiPath, "sublayer_myo_trabecular_1.tif", "endo", "endo_base", "tmp_middle_apex");
             segmentLabel(roiPath, "sublayer_myo_trabecular_2.tif", "tmp_middle_apex", "endo_middle", "endo_apex");
+            Filer.delete(roiPath, "labels", "label_tmp_middle_apex.tif");
+            Filer.delete(roiPath, "zips", "zip_tmp_middle_apex.zip");
         }
 
     }
