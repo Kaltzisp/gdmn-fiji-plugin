@@ -1,9 +1,14 @@
 package org.gdmn.imagej.process;
 
+import ij.ImagePlus;
+import ij.plugin.ChannelSplitter;
+import ij.plugin.ImageCalculator;
+import ij.process.ImageConverter;
+import inra.ijpb.morphology.Morphology;
+import inra.ijpb.morphology.Strel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import org.gdmn.imagej.utils.BatchCommand;
 import org.gdmn.imagej.utils.Defaults;
 import org.gdmn.imagej.utils.Filer;
@@ -15,16 +20,12 @@ import org.scijava.plugin.Plugin;
 import org.scijava.widget.Button;
 import org.scijava.widget.NumberWidget;
 
-import ij.ImagePlus;
-import ij.plugin.ChannelSplitter;
-import ij.plugin.ImageCalculator;
-import ij.process.ImageConverter;
-import inra.ijpb.morphology.Morphology;
-import inra.ijpb.morphology.Strel;
-
+/**
+ * Command to split fluorescence image into distinct channels with minimal crosstalk.
+ */
 @Plugin(type = Command.class, label = "Clean Channels", menu = {
-    @Menu(label = "2D Macro Tool"),
-    @Menu(label = "Clean Channels", weight = 1)
+        @Menu(label = "2D Macro Tool"),
+        @Menu(label = "Clean Channels", weight = 1)
 })
 public class CleanChannels extends BatchCommand {
 
@@ -49,42 +50,41 @@ public class CleanChannels extends BatchCommand {
     @Parameter(label = "Run", callback = "runAll")
     private Button runButton;
 
-    public void process(String roiPath) {
+    /**
+     * Runs the command on the supplied parameters.
+     */
+    public void process(String basePath) {
+        String[] channels = { this.channel1, this.channel2, this.channel3, this.channel4 };
+        this.cleanChannels(basePath, "roi.tif", channels, this.crosstalkSuppression);
+    }
 
-        ImagePlus imp = new ImagePlus(roiPath);
+    /**
+     * Splits a fluorescence image into cleaned output channels.
+     *
+     * @param basePath the path to the image folder.
+     * @param roiName  the name of the image file.
+     */
+    private void cleanChannels(String basePath, String roiName, String[] channelNames, double crosstalkSuppression) {
 
-        // Converting to grayscale.
+        // Opening image and converting to grayscale.
+        ImagePlus imp = new ImagePlus(basePath);
         ImageConverter ic = new ImageConverter(imp);
         ic.convertToGray8();
 
-        // Declarations.
-        ImagePlus myoImp = null;
-        ImagePlus endoImp = null;
-        ImagePlus markerImp = null;
-        ImagePlus nucleiImp = null;
-
-        // Splitting image.
+        // Splitting image into channels and getting channel indexes.
         ImagePlus[] imps = ChannelSplitter.split(imp);
-        List<String> channels = new ArrayList<>(Arrays.asList(channel1, channel2, channel3, channel4));
-        int myoIndex = channels.indexOf("myo");
-        int endoIndex = channels.indexOf("endo");
-        int markerIndex = channels.indexOf("marker");
-        int nucleiIndex = channels.indexOf("nuclei");
+        List<String> channels = new ArrayList<>(Arrays.asList(channelNames));
+        final int myoIndex = channels.indexOf("myo");
+        final int endoIndex = channels.indexOf("endo");
+        final int markerIndex = channels.indexOf("marker");
+        final int nucleiIndex = channels.indexOf("nuclei");
         imp.close();
 
-        // Assigning channels.
-        if (myoIndex >= 0) {
-            myoImp = imps[myoIndex];
-        }
-        if (endoIndex >= 0) {
-            endoImp = imps[endoIndex];
-        }
-        if (markerIndex >= 0) {
-            markerImp = imps[markerIndex];
-        }
-        if (nucleiIndex >= 0) {
-            nucleiImp = imps[nucleiIndex];
-        }
+        // Assigning channels to ImagePlus objects.
+        ImagePlus myoImp = (myoIndex >= 0) ? imps[myoIndex] : null;
+        ImagePlus endoImp = (endoIndex >= 0) ? imps[endoIndex] : null;
+        ImagePlus markerImp = (markerIndex >= 0) ? imps[markerIndex] : null;
+        ImagePlus nucleiImp = (nucleiIndex >= 0) ? imps[nucleiIndex] : null;
 
         // Cleaning nuclear channel.
         if (nucleiImp != null) {
@@ -94,7 +94,7 @@ public class CleanChannels extends BatchCommand {
             if (endoImp != null) {
                 nucleiImp = passClean(nucleiImp, endoImp);
             }
-            Filer.save(nucleiImp, roiPath, "channels", "nuclei.tif");
+            Filer.save(nucleiImp, basePath, "channels", "nuclei.tif");
             nucleiImp.close();
         }
 
@@ -103,11 +103,11 @@ public class CleanChannels extends BatchCommand {
             ImagePlus endoSuppressed = endoImp.duplicate();
             endoSuppressed.getProcessor().multiply(crosstalkSuppression);
             ImagePlus cleanedMyo = ImageCalculator.run(myoImp, endoSuppressed, "subtract create");
-            Filer.save(cleanedMyo, roiPath, "channels", "myo.tif");
+            Filer.save(cleanedMyo, basePath, "channels", "myo.tif");
             endoSuppressed.close();
             cleanedMyo.close();
             ImagePlus cleanedEndo = ImageCalculator.run(endoImp, myoImp, "subtract create");
-            Filer.save(cleanedEndo, roiPath, "channels", "endo.tif");
+            Filer.save(cleanedEndo, basePath, "channels", "endo.tif");
             myoImp.close();
             endoImp.close();
             cleanedEndo.close();
@@ -115,11 +115,18 @@ public class CleanChannels extends BatchCommand {
 
         // Saving marker channel.
         if (markerImp != null) {
-            Filer.save(markerImp, roiPath, "channels", "marker.tif");
+            Filer.save(markerImp, basePath, "channels", "marker.tif");
             markerImp.close();
         }
     }
 
+    /**
+     * Cleans crosstalk from an image by performing a double-pass clean.
+     *
+     * @param baseImage the image to be cleaned.
+     * @param passImage the image to filter crosstalk from.
+     * @return the cleaned image.
+     */
     private ImagePlus passClean(ImagePlus baseImage, ImagePlus passImage) {
         ImagePlus dilationImage = baseImage.duplicate();
         dilationImage.setProcessor(Morphology.dilation(dilationImage.getProcessor(), Strel.Shape.DISK.fromRadius(2)));
