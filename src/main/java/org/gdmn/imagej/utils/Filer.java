@@ -28,7 +28,7 @@ public class Filer {
      *                   (i.e. "roi.tif").
      * @return the list of paths to each image folder.
      */
-    public static List<String> getRoiPaths(String pathString, String pattern) {
+    public static List<String> getBasePaths(String pathString, String pattern) {
         List<String> pathList = new ArrayList<String>();
         Path parentDir = Paths.get(pathString);
         try (Stream<Path> paths = Files.walk(parentDir)) {

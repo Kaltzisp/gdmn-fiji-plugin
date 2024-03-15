@@ -32,7 +32,7 @@ public abstract class BatchCommand implements Command, Interactive {
     @Parameter(label = "File pattern:", persist = false, callback = "updateCollectorInfo")
     public String filePattern = Defaults.get("filePattern", "roi.tif");
 
-    private int numTargetFiles = Filer.getRoiPaths(this.selectedDir, this.filePattern).size();
+    private int numTargetFiles = Filer.getBasePaths(this.selectedDir, this.filePattern).size();
 
     @Parameter(visibility = ItemVisibility.MESSAGE, persist = false)
     private String targetMessage = setTargetMessage();
@@ -64,7 +64,7 @@ public abstract class BatchCommand implements Command, Interactive {
     }
 
     public void updateCollectorInfo() {
-        this.numTargetFiles = Filer.getRoiPaths(this.selectedDir, this.filePattern).size();
+        this.numTargetFiles = Filer.getBasePaths(this.selectedDir, this.filePattern).size();
         this.targetMessage = setTargetMessage();
     }
 
@@ -84,7 +84,7 @@ public abstract class BatchCommand implements Command, Interactive {
         return message;
     }
 
-    public abstract void process(String roiPath);
+    public abstract void process(String basePath);
 
     /**
      * Loops through the list of selected files and runs the command on each.
@@ -94,14 +94,14 @@ public abstract class BatchCommand implements Command, Interactive {
         BatchCommand self = this;
         Logger.logProcess(self);
         // Getting target dir and files.
-        List<String> roiPaths = Filer.getRoiPaths(self.selectedDir, self.filePattern);
-        int n = roiPaths.size();
+        List<String> basePaths = Filer.getBasePaths(self.selectedDir, self.filePattern);
+        int n = basePaths.size();
         // Creating a new thread to process the images.
         Thread runThread = new Thread(new Runnable() {
             public void run() {
                 for (int i = 0; i < n; i++) {
                     IJ.showStatus("!Processing image " + (i + 1) + " of " + n + ".");
-                    self.process(roiPaths.get(i));
+                    self.process(basePaths.get(i));
                 }
                 IJ.showStatus("!Command finished: " + self.getClass().getSimpleName() + " on n=" + n + " images.");
             }
