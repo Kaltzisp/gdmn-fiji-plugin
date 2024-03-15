@@ -62,7 +62,7 @@ public class CreateMask extends BatchCommand {
      * @param closingRadius the radius to apply for the closing filter.
      * @param savePath the path to save the mask to.
      */
-    private void createMask(String imagePath, double multiplier, double meadianRadius, int closingRadius, String savePath) {
+    private void createMask(String imagePath, double multiplier, double medianRadius, int closingRadius, String savePath) {
 
         // Opening image and getting processor.
         ImagePlus imp = new ImagePlus(imagePath);
