@@ -1,5 +1,6 @@
 package org.gdmn.imagej.utils;
 
+import ij.IJ;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -9,9 +10,15 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import ij.IJ;
-
+/**
+ * Contains static logging methods for the plugin.
+ */
 public class Logger {
+    /**
+     * Creates a logfile of the executed command.
+     *
+     * @param instance the BatchCommand instance that is being executed.
+     */
     public static void logProcess(BatchCommand instance) {
 
         // Setting up log text.

@@ -1,20 +1,20 @@
 package org.gdmn.imagej.utils;
 
-import org.scijava.command.Command;
-import org.scijava.command.Interactive;
-import org.scijava.plugin.Parameter;
-
+import ij.IJ;
+import ij.io.DirectoryChooser;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-
 import org.scijava.ItemVisibility;
+import org.scijava.command.Command;
+import org.scijava.command.Interactive;
+import org.scijava.plugin.Parameter;
 import org.scijava.widget.Button;
 
-import ij.IJ;
-import ij.io.DirectoryChooser;
-
+/**
+ * Overarching BatchCommand class extended by each of the plugin commands.
+ */
 public abstract class BatchCommand implements Command, Interactive {
 
     @Parameter(visibility = ItemVisibility.MESSAGE)
@@ -31,12 +31,15 @@ public abstract class BatchCommand implements Command, Interactive {
 
     @Parameter(label = "File pattern:", persist = false, callback = "updateCollectorInfo")
     public String filePattern = Defaults.get("filePattern", "roi.tif");
-    
-    private int nTargetFiles = Filer.getFiles(this.selectedDir, this.filePattern).size();
+
+    private int numTargetFiles = Filer.getRoiPaths(this.selectedDir, this.filePattern).size();
 
     @Parameter(visibility = ItemVisibility.MESSAGE, persist = false)
     private String targetMessage = setTargetMessage();
 
+    /**
+     * Allows the user to choose a target directory for analysis.
+     */
     public void selectDir() {
         DirectoryChooser.setDefaultDirectory(this.selectedDir);
         DirectoryChooser dir = new DirectoryChooser("Select folder");
@@ -47,6 +50,9 @@ public abstract class BatchCommand implements Command, Interactive {
         }
     }
 
+    /**
+     * Opens the target dir in the user's file explorer.
+     */
     public void openDir() {
         Path dirPath = Paths.get(this.selectedDir);
         String[] array = { "explorer.exe", dirPath.toString() };
@@ -58,19 +64,19 @@ public abstract class BatchCommand implements Command, Interactive {
     }
 
     public void updateCollectorInfo() {
-        this.nTargetFiles = Filer.getFiles(this.selectedDir, this.filePattern).size();
+        this.numTargetFiles = Filer.getRoiPaths(this.selectedDir, this.filePattern).size();
         this.targetMessage = setTargetMessage();
     }
 
     private String setTargetMessage() {
         String message = "";
-        if (this.nTargetFiles > 1) {
-            message = "<p style='color:#006600'>ImageJ has identified " + this.nTargetFiles
+        if (this.numTargetFiles > 1) {
+            message = "<p style='color:#006600'>ImageJ has identified " + this.numTargetFiles
                     + " images which match these parameters.</p>";
-        } else if (this.nTargetFiles == 1) {
-            message = "<p style='color:#006600'>ImageJ has identified " + this.nTargetFiles
+        } else if (this.numTargetFiles == 1) {
+            message = "<p style='color:#006600'>ImageJ has identified " + this.numTargetFiles
                     + " image which matches these parameters.</p>";
-        } else if (this.nTargetFiles == 0) {
+        } else if (this.numTargetFiles == 0) {
             message = "<p style='color:#bb0000'>No matching images found.</p>";
         } else {
             message = "<p style='color:#bb0000'>An error occurred.</p>";
@@ -80,11 +86,17 @@ public abstract class BatchCommand implements Command, Interactive {
 
     public abstract void process(String roiPath);
 
+    /**
+     * Loops through the list of selected files and runs the command on each.
+     */
     public void runAll() {
+        // Specifying self as the command instance.
         BatchCommand self = this;
-        Logger.logProcess(this);
-        List<String> roiPaths = Filer.getFiles(this.selectedDir, this.filePattern);
+        Logger.logProcess(self);
+        // Getting target dir and files.
+        List<String> roiPaths = Filer.getRoiPaths(self.selectedDir, self.filePattern);
         int n = roiPaths.size();
+        // Creating a new thread to process the images.
         Thread runThread = new Thread(new Runnable() {
             public void run() {
                 for (int i = 0; i < n; i++) {
@@ -98,15 +110,7 @@ public abstract class BatchCommand implements Command, Interactive {
     }
 
     public void run() {
-        // Do nothing.
-    }
-
-    public void preview() {
-        // Do nothing.
-    }
-
-    public void cancel() {
-        // Do nothing.
+        // Empty method - command is not runnable via this method.
     }
 
 }
