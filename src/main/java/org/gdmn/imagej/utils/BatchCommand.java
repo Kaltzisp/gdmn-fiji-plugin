@@ -63,6 +63,9 @@ public abstract class BatchCommand implements Command, Interactive {
         }
     }
 
+    /**
+     * Updates the number of files detected by the plugin in the UI.
+     */
     public void updateCollectorInfo() {
         this.numTargetFiles = Filer.getBasePaths(this.selectedDir, this.filePattern).size();
         this.targetMessage = setTargetMessage();
