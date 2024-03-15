@@ -33,10 +33,10 @@ public class CreateMask extends BatchCommand {
     private String channelType = Defaults.get("channelType", "myo");
 
     @Parameter(label = "Multiplier:")
-    private float multiplier = Float.parseFloat(Defaults.get("multiplier", "2"));
+    private double multiplier = Double.parseDouble(Defaults.get("multiplier", "2"));
 
     @Parameter(label = "Median radius:")
-    private float medianRadius = Float.parseFloat(Defaults.get("medianRadius", "6"));
+    private double medianRadius = Double.parseDouble(Defaults.get("medianRadius", "6"));
 
     @Parameter(label = "Closing radius:")
     private int closingRadius = Integer.parseInt(Defaults.get("closingRadius", "2"));
@@ -44,27 +44,24 @@ public class CreateMask extends BatchCommand {
     @Parameter(label = "Run", callback = "runAll")
     private Button runButton;
 
-    /**
-     * Runs the command on the supplied parameters.
-     */
     public void process(String basePath) {
-        String imagePath = Filer.getPath(basePath, "channels", this.channelType + ".tif");
-        String savePath = Filer.getPath(basePath, "masks", "mask_" + this.channelType + ".tif");
-        createMask(imagePath, this.multiplier, this.medianRadius, this.closingRadius, savePath);
+        this.createMask(basePath, this.channelType, this.multiplier, this.medianRadius, this.closingRadius);
     }
 
     /**
-     * Creates a mask from a fluorescence image.
+     * Creates a mask from a fluorescence image (single-channel).
      *
-     * @param imagePath the path to the input image file.
+     * @param basePath the path to the image folder.
+     * @param channel the name of the channel to create a mask from.
      * @param multiplier the degree of amplification.
      * @param meadianRadius the radius to apply for the median filter.
      * @param closingRadius the radius to apply for the closing filter.
-     * @param savePath the path to save the mask to.
+     * @param maskName the name of the output mask.
      */
-    private void createMask(String imagePath, double multiplier, double medianRadius, int closingRadius, String savePath) {
+    private void createMask(String basePath, String channel, double multiplier, double medianRadius, int closingRadius) {
 
         // Opening image and getting processor.
+        String imagePath = Filer.getPath(basePath, "channels", channel + ".tif");
         ImagePlus imp = new ImagePlus(imagePath);
         ImageProcessor ip = imp.getProcessor();
 
@@ -81,7 +78,7 @@ public class CreateMask extends BatchCommand {
         imp.setRoi(roi);
 
         // Saving mask.
-        Filer.save(imp, savePath, "", "");
+        Filer.save(imp, basePath, "masks", "mask_" + channel + ".tif");
         imp.close();
     }
 

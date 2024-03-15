@@ -6,6 +6,8 @@ import ij.plugin.ImageCalculator;
 import ij.process.ImageConverter;
 import inra.ijpb.morphology.Morphology;
 import inra.ijpb.morphology.Strel;
+
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -50,9 +52,6 @@ public class CleanChannels extends BatchCommand {
     @Parameter(label = "Run", callback = "runAll")
     private Button runButton;
 
-    /**
-     * Runs the command on the supplied parameters.
-     */
     public void process(String basePath) {
         String[] channels = { this.channel1, this.channel2, this.channel3, this.channel4 };
         this.cleanChannels(basePath, "roi.tif", channels, this.crosstalkSuppression);
@@ -67,7 +66,8 @@ public class CleanChannels extends BatchCommand {
     private void cleanChannels(String basePath, String roiName, String[] channelNames, double crosstalkSuppression) {
 
         // Opening image and converting to grayscale.
-        ImagePlus imp = new ImagePlus(basePath);
+        String roiPath = Paths.get(basePath, roiName).toString();
+        ImagePlus imp = new ImagePlus(roiPath);
         ImageConverter ic = new ImageConverter(imp);
         ic.convertToGray8();
 
