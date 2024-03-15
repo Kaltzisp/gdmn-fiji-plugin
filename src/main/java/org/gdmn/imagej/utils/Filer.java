@@ -45,12 +45,12 @@ public class Filer {
      * Saves an IJ image to the specified location.
      *
      * @param imp       the ImagePlus object to be saved.
-     * @param roiPath   the path to the image folder.
+     * @param basePath   the path to the image folder.
      * @param subFolder the sub-folder to save to.
      * @param fileName  the file name to save as.
      */
-    public static void save(ImagePlus imp, String roiPath, String subFolder, String fileName) {
-        String savePath = getPath(roiPath, subFolder, fileName);
+    public static void save(ImagePlus imp, String basePath, String subFolder, String fileName) {
+        String savePath = getPath(basePath, subFolder, fileName);
         IJ.save(imp, savePath);
     }
 
