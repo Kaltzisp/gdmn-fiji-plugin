@@ -6,7 +6,6 @@ import ij.plugin.ImageCalculator;
 import ij.process.ImageConverter;
 import inra.ijpb.morphology.Morphology;
 import inra.ijpb.morphology.Strel;
-
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
