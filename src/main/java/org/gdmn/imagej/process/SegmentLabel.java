@@ -58,7 +58,6 @@ public class SegmentLabel extends BatchCommand {
             Filer.delete(basePath, "labels", "label_tmp_middle_apex.tif");
             Filer.delete(basePath, "zips", "zip_tmp_middle_apex.zip");
         }
-
     }
 
     /**
