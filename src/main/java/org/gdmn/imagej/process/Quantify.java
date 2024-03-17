@@ -37,7 +37,7 @@ public class Quantify extends BatchCommand {
     private String header = "<h2 style='width: 500px'>Generate quantifications</h2>";
 
     @Parameter(label = "Threshold:")
-    private float markerthreshold = Float.parseFloat(Defaults.get("markerthreshold", "0.30"));
+    private double markerthreshold = Double.parseDouble(Defaults.get("markerthreshold", "0.30"));
 
     @Parameter(label = "Run", callback = "runAll")
     private Button runButton;
