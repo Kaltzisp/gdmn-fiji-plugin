@@ -23,7 +23,6 @@ import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.widget.Button;
-import org.scijava.widget.NumberWidget;
 
 /**
  * Command to generate quantifications.
