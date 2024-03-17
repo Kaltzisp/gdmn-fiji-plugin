@@ -25,7 +25,7 @@ import org.scijava.widget.NumberWidget;
  * Command to split fluorescence image into distinct channels with minimal
  * crosstalk.
  */
-@Plugin(type = Command.class, label = "Clean Channels", menu = {
+@Plugin(type = Command.class, menu = {
         @Menu(label = "2D Macro Tool"),
         @Menu(label = "Clean Channels", weight = 1)
 })

@@ -20,7 +20,7 @@ import org.scijava.widget.Button;
 /**
  * Command to create light-based masks from channels.
  */
-@Plugin(type = Command.class, label = "Create Masks", menu = {
+@Plugin(type = Command.class, menu = {
         @Menu(label = "2D Macro Tool"),
         @Menu(label = "Create Masks", weight = 2)
 })

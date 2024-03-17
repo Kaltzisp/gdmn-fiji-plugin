@@ -19,9 +19,9 @@ import org.scijava.widget.Button;
 /**
  * Command to segment label image.
  */
-@Plugin(type = Command.class, label = "Segment Labels", menu = {
+@Plugin(type = Command.class, menu = {
         @Menu(label = "2D Macro Tool"),
-        @Menu(label = "Nuclear Classification", weight = 5)
+        @Menu(label = "Segment Label", weight = 5)
 })
 public class SegmentLabel extends BatchCommand {
 

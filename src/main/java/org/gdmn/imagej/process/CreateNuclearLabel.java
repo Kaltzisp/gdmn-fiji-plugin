@@ -21,9 +21,9 @@ import org.scijava.widget.Button;
 /**
  * Command to run StarDist nuclei individualisation.
  */
-@Plugin(type = Command.class, label = "Create Nuclear Label", menu = {
+@Plugin(type = Command.class, menu = {
         @Menu(label = "2D Macro Tool"),
-        @Menu(label = "Nuclear Individualisation", weight = 4)
+        @Menu(label = "Create Nuclear Label", weight = 4)
 })
 public class CreateNuclearLabel extends BatchCommand {
 

@@ -27,9 +27,9 @@ import org.scijava.widget.Button;
 /**
  * Command to generate quantifications.
  */
-@Plugin(type = Command.class, label = "Extract Quantifications", menu = {
+@Plugin(type = Command.class, menu = {
         @Menu(label = "2D Macro Tool"),
-        @Menu(label = "Extract Quantifications", weight = 7)
+        @Menu(label = "Analyze Marker", weight = 7)
 })
 public class Quantify extends BatchCommand {
 

@@ -20,14 +20,14 @@ import org.scijava.widget.Button;
 /**
  * Command to draw custom masks from a template.
  */
-@Plugin(type = Command.class, label = "Create Custom Masks", menu = {
+@Plugin(type = Command.class, menu = {
         @Menu(label = "2D Macro Tool"),
-        @Menu(label = "Create Custom Masks", weight = 3)
+        @Menu(label = "Draw Custom Mask", weight = 3)
 })
-public class CreateCustomMask extends BatchCommand {
+public class DrawCustomMask extends BatchCommand {
 
     @Parameter(visibility = ItemVisibility.MESSAGE)
-    private String header = "<h2 style='width: 500px'>Create custom mask</h2>";
+    private String header = "<h2 style='width: 500px'>Draw Custom Mask</h2>";
 
     @Parameter(label = "Template type", persist = false, choices = { "Entire ROI", "Channel", "Mask" })
     private String templateType = Defaults.get("templateType", "Mask");
