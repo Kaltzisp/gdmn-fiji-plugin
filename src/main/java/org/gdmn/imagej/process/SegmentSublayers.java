@@ -1,5 +1,11 @@
 package org.gdmn.imagej.process;
 
+import ij.ImagePlus;
+import ij.gui.Roi;
+import ij.measure.Measurements;
+import ij.plugin.RoiEnlarger;
+import ij.plugin.filter.ThresholdToSelection;
+import ij.process.ImageProcessor;
 import org.gdmn.imagej.utils.BatchCommand;
 import org.gdmn.imagej.utils.Defaults;
 import org.gdmn.imagej.utils.Filer;
@@ -10,16 +16,12 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.widget.Button;
 
-import ij.ImagePlus;
-import ij.gui.Roi;
-import ij.measure.Measurements;
-import ij.plugin.RoiEnlarger;
-import ij.plugin.filter.ThresholdToSelection;
-import ij.process.ImageProcessor;
-
+/**
+ * Command to segment tissue labels into sublayers.
+ */
 @Plugin(type = Command.class, label = "Segment sublayers", menu = {
-    @Menu(label = "2D Macro Tool"),
-    @Menu(label = "Segment sublayers", weight = 6)
+        @Menu(label = "2D Macro Tool"),
+        @Menu(label = "Segment sublayers", weight = 6)
 })
 public class SegmentSublayers extends BatchCommand {
     @Parameter(visibility = ItemVisibility.MESSAGE)
@@ -37,29 +39,42 @@ public class SegmentSublayers extends BatchCommand {
     @Parameter(label = "Run", callback = "runAll")
     private Button runButton;
 
-    public void process(String roiPath) {
+    /**
+     * Runs sublayer segmentation.
+     */
+    public void process(String basePath) {
         // Opening files.
         if (subsegmentEndocardium) {
-            subSegment(roiPath, "mask_myo_compact.tif", "label_myo_trabecular.tif", "sublayer_myo_trabecular");
+            subSegment(basePath, "mask_myo_compact.tif", "label_myo_trabecular.tif", "sublayer_myo_trabecular");
         }
         if (subsegmentTrabeculae) {
-            // NEED TO FIX THIS LINE. SHOULD PROBABLY JUST USE THE SAME FOR ENDOCARDIAL SEGMENTATION.
-            // Instead of running again here, simply add an option for users in the SegmentLabel command to segment according to generated sublayers.
+            // NEED TO FIX THIS LINE. SHOULD PROBABLY JUST USE THE SAME FOR ENDOCARDIAL
+            // SEGMENTATION.
+            // Instead of running again here, simply add an option for users in the
+            // SegmentLabel command to segment according to generated sublayers.
             // subSegment(roiPath, "mask_myo_compact.tif", "label_");
         }
     }
 
-    private void subSegment(String roiPath, String baseMask, String baseLabel, String sublayer) {
+    /**
+     * Segments a tissue nuclei label into spatial sublayers.
+     *
+     * @param basePath  the path to the image folder.
+     * @param baseMask  the name of the base layer mask.
+     * @param baseLabel the label to use for segmentation.
+     * @param sublayer  the name of the sublayer output.
+     */
+    private void subSegment(String basePath, String baseMask, String baseLabel, String sublayer) {
         // Opening mask.
-        ImagePlus maskImp = new ImagePlus(Filer.getPath(roiPath, "masks", baseMask));
-        Roi mask = maskImp.getRoi();
-        maskImp.deleteRoi();
+        ImagePlus maskImp = new ImagePlus(Filer.getPath(basePath, "masks", baseMask));
+        final Roi mask = maskImp.getRoi();
         ImageProcessor maskIp = maskImp.getProcessor();
+        maskImp.deleteRoi();
         maskIp.setColor(0);
         maskIp.fill();
 
         // Opening label and getting total non-zero area.
-        ImagePlus labelImp = new ImagePlus(Filer.getPath(roiPath, "labels", baseLabel));
+        ImagePlus labelImp = new ImagePlus(Filer.getPath(basePath, "labels", baseLabel));
         double totalArea = labelImp.getStatistics(Measurements.AREA_FRACTION).areaFraction
                 * labelImp.getStatistics().area;
         labelImp.setRoi(mask);
@@ -103,7 +118,7 @@ public class SegmentSublayers extends BatchCommand {
             Roi roi = ThresholdToSelection.run(outputMask);
             outputMask.setRoi(roi);
             // Saving mask.
-            Filer.save(outputMask, roiPath, "masks", sublayer + "_" + i + ".tif");
+            Filer.save(outputMask, basePath, "masks", sublayer + "_" + i + ".tif");
             outputMask.close();
         }
     }
