@@ -5,5 +5,5 @@ pack.sh
 # Editor config
 .vscode
 
-#Test files
-*Example.*
+# Test files
+debug
