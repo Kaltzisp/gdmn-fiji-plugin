@@ -30,12 +30,6 @@ public class SegmentSublayers extends BatchCommand {
     @Parameter(label = "Number of sublayers:")
     private int numSublayers = Integer.parseInt(Defaults.get("numSublayers", "3"));
 
-    @Parameter(label = "Subsegment trabeculae:")
-    private boolean subsegmentTrabeculae = true;
-
-    @Parameter(label = "Subsegment endocardium:")
-    private boolean subsegmentEndocardium = true;
-
     @Parameter(label = "Run", callback = "runAll")
     private Button runButton;
 
@@ -43,16 +37,29 @@ public class SegmentSublayers extends BatchCommand {
      * Runs sublayer segmentation.
      */
     public void process(String basePath) {
-        // Opening files.
-        if (subsegmentEndocardium) {
-            subSegment(basePath, "mask_myo_compact.tif", "label_myo_trabecular.tif", "sublayer_myo_trabecular");
-        }
-        if (subsegmentTrabeculae) {
-            // NEED TO FIX THIS LINE. SHOULD PROBABLY JUST USE THE SAME FOR ENDOCARDIAL
-            // SEGMENTATION.
-            // Instead of running again here, simply add an option for users in the
-            // SegmentLabel command to segment according to generated sublayers.
-            // subSegment(roiPath, "mask_myo_compact.tif", "label_");
+        // Creating layer boundary masks.
+        subSegment(basePath, "mask_myo_compact.tif", "label_myo_trabecular.tif", "sublayer_myo_trabecular");
+
+        // Subsegmenting and saving labels.
+        if (numSublayers == 2) {
+            SegmentLabel.segmentLabel(basePath, "sublayer_myo_trabecular_1.tif", "myo_trabecular",
+                    "myo_trabecular_base",
+                    "myo_trabecular_apex");
+            SegmentLabel.segmentLabel(basePath, "sublayer_myo_trabecular_1.tif", "endo", "endo_base",
+                    "endo_apex");
+        } else if (numSublayers == 3) {
+            SegmentLabel.segmentLabel(basePath, "sublayer_myo_trabecular_1.tif", "myo_trabecular",
+                    "myo_trabecular_base",
+                    "tmp_middle_apex");
+            SegmentLabel.segmentLabel(basePath, "sublayer_myo_trabecular_2.tif", "tmp_middle_apex",
+                    "myo_trabecular_middle",
+                    "myo_trabecular_apex");
+            SegmentLabel.segmentLabel(basePath, "sublayer_myo_trabecular_1.tif", "endo", "endo_base",
+                    "tmp_middle_apex");
+            SegmentLabel.segmentLabel(basePath, "sublayer_myo_trabecular_2.tif", "tmp_middle_apex", "endo_middle",
+                    "endo_apex");
+            Filer.delete(basePath, "labels", "label_tmp_middle_apex.tif");
+            Filer.delete(basePath, "zips", "zip_tmp_middle_apex.zip");
         }
     }
 

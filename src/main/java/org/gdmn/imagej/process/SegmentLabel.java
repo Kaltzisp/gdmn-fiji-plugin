@@ -31,8 +31,7 @@ public class SegmentLabel extends BatchCommand {
     @Parameter(label = "Segmentation", choices = {
             "roi -> myo/endo",
             "myo -> compact/trabecular",
-            "endo -> endo/epi",
-            "trabecular -> sublayers"
+            "endo -> endo/epi"
     })
     private String segmentationType = Defaults.get("segmentationType", "roi -> myo/endo");
 
@@ -49,15 +48,6 @@ public class SegmentLabel extends BatchCommand {
             segmentLabel(basePath, "mask_myo_compact.tif", "myo", "myo_compact", "myo_trabecular");
         } else if (segmentationType.equals("endo -> endo/epi")) {
             segmentLabel(basePath, "mask_endo.tif", "endo", "endo", "epi");
-        } else if (segmentationType.equals("trabecular -> sublayers")) {
-            segmentLabel(basePath, "sublayer_myo_trabecular_1.tif", "myo_trabecular", "myo_trabecular_base",
-                    "tmp_middle_apex");
-            segmentLabel(basePath, "sublayer_myo_trabecular_2.tif", "tmp_middle_apex", "myo_trabecular_middle",
-                    "myo_trabecular_apex");
-            segmentLabel(basePath, "sublayer_myo_trabecular_1.tif", "endo", "endo_base", "tmp_middle_apex");
-            segmentLabel(basePath, "sublayer_myo_trabecular_2.tif", "tmp_middle_apex", "endo_middle", "endo_apex");
-            Filer.delete(basePath, "labels", "label_tmp_middle_apex.tif");
-            Filer.delete(basePath, "zips", "zip_tmp_middle_apex.zip");
         }
     }
 
@@ -70,7 +60,7 @@ public class SegmentLabel extends BatchCommand {
      * @param innerLabel the name of the output inner label.
      * @param outerLabel the name of the output outer label.
      */
-    private void segmentLabel(String basePath, String baseMask, String baseLabel, String innerLabel,
+    public static void segmentLabel(String basePath, String baseMask, String baseLabel, String innerLabel,
             String outerLabel) {
         // Opening mask and roi managers.
         ImagePlus maskImp = new ImagePlus(Filer.getPath(basePath, "masks", baseMask));
