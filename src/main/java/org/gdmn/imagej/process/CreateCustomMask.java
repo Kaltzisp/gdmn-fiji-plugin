@@ -24,7 +24,7 @@ import org.scijava.widget.Button;
         @Menu(label = "2D Macro Tool"),
         @Menu(label = "Create Custom Masks", weight = 3)
 })
-public class CustomMask extends BatchCommand {
+public class CreateCustomMask extends BatchCommand {
 
     @Parameter(visibility = ItemVisibility.MESSAGE)
     private String header = "<h2 style='width: 500px'>Create custom mask</h2>";

@@ -19,7 +19,7 @@ import org.scijava.widget.Button;
 /**
  * Command to segment tissue labels into sublayers.
  */
-@Plugin(type = Command.class, label = "Segment sublayers", menu = {
+@Plugin(type = Command.class, label = "Segment Sublayers", menu = {
         @Menu(label = "2D Macro Tool"),
         @Menu(label = "Segment sublayers", weight = 6)
 })

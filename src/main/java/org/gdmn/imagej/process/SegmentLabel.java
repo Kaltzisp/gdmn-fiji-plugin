@@ -19,7 +19,7 @@ import org.scijava.widget.Button;
 /**
  * Command to segment label image.
  */
-@Plugin(type = Command.class, label = "Nuclear Classification", menu = {
+@Plugin(type = Command.class, label = "Segment Labels", menu = {
         @Menu(label = "2D Macro Tool"),
         @Menu(label = "Nuclear Classification", weight = 5)
 })
