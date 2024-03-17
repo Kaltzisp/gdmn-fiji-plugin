@@ -1,5 +1,10 @@
 package org.gdmn.imagej.process;
 
+import ij.ImagePlus;
+import ij.gui.Roi;
+import ij.plugin.LutLoader;
+import ij.plugin.frame.RoiManager;
+import ij.process.ImageProcessor;
 import org.gdmn.imagej.utils.BatchCommand;
 import org.gdmn.imagej.utils.Defaults;
 import org.gdmn.imagej.utils.Filer;
@@ -10,15 +15,12 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.widget.Button;
 
-import ij.ImagePlus;
-import ij.gui.Roi;
-import ij.plugin.LutLoader;
-import ij.plugin.frame.RoiManager;
-import ij.process.ImageProcessor;
-
+/**
+ * Command to segment label image.
+ */
 @Plugin(type = Command.class, label = "Nuclear Classification", menu = {
-    @Menu(label = "2D Macro Tool"),
-    @Menu(label = "Nuclear Classification", weight = 5)
+        @Menu(label = "2D Macro Tool"),
+        @Menu(label = "Nuclear Classification", weight = 5)
 })
 public class SegmentLabel extends BatchCommand {
 
@@ -36,35 +38,50 @@ public class SegmentLabel extends BatchCommand {
     @Parameter(label = "Run", callback = "runAll")
     private Button runButton;
 
-    public void process(String roiPath) {
+    /**
+     * Running segmentLabel according to specified type.
+     */
+    public void process(String basePath) {
         if (segmentationType.equals("roi -> myo/endo")) {
-            segmentLabel(roiPath, "mask_myo.tif", "roi", "myo", "endo");
+            segmentLabel(basePath, "mask_myo.tif", "roi", "myo", "endo");
         } else if (segmentationType.equals("myo -> compact/trabecular")) {
-            segmentLabel(roiPath, "mask_myo_compact.tif", "myo", "myo_compact", "myo_trabecular");
+            segmentLabel(basePath, "mask_myo_compact.tif", "myo", "myo_compact", "myo_trabecular");
         } else if (segmentationType.equals("endo -> endo/epi")) {
-            segmentLabel(roiPath, "mask_endo.tif", "endo", "endo", "epi");
+            segmentLabel(basePath, "mask_endo.tif", "endo", "endo", "epi");
         } else if (segmentationType.equals("trabecular -> sublayers")) {
-            segmentLabel(roiPath, "sublayer_myo_trabecular_1.tif", "myo_trabecular", "myo_trabecular_base", "tmp_middle_apex");
-            segmentLabel(roiPath, "sublayer_myo_trabecular_2.tif", "tmp_middle_apex", "myo_trabecular_middle", "myo_trabecular_apex");
-            segmentLabel(roiPath, "sublayer_myo_trabecular_1.tif", "endo", "endo_base", "tmp_middle_apex");
-            segmentLabel(roiPath, "sublayer_myo_trabecular_2.tif", "tmp_middle_apex", "endo_middle", "endo_apex");
-            Filer.delete(roiPath, "labels", "label_tmp_middle_apex.tif");
-            Filer.delete(roiPath, "zips", "zip_tmp_middle_apex.zip");
+            segmentLabel(basePath, "sublayer_myo_trabecular_1.tif", "myo_trabecular", "myo_trabecular_base",
+                    "tmp_middle_apex");
+            segmentLabel(basePath, "sublayer_myo_trabecular_2.tif", "tmp_middle_apex", "myo_trabecular_middle",
+                    "myo_trabecular_apex");
+            segmentLabel(basePath, "sublayer_myo_trabecular_1.tif", "endo", "endo_base", "tmp_middle_apex");
+            segmentLabel(basePath, "sublayer_myo_trabecular_2.tif", "tmp_middle_apex", "endo_middle", "endo_apex");
+            Filer.delete(basePath, "labels", "label_tmp_middle_apex.tif");
+            Filer.delete(basePath, "zips", "zip_tmp_middle_apex.zip");
         }
 
     }
 
-    private void segmentLabel(String roiPath, String baseMask, String baseLabel, String innerLabel, String outerLabel) {
+    /**
+     * Segments a nuclei label into sublabels on a mask.
+     *
+     * @param basePath   the path to the image folder.
+     * @param baseMask   the mask to segment on.
+     * @param baseLabel  the base label.
+     * @param innerLabel the name of the output inner label.
+     * @param outerLabel the name of the output outer label.
+     */
+    private void segmentLabel(String basePath, String baseMask, String baseLabel, String innerLabel,
+            String outerLabel) {
         // Opening mask and roi managers.
-        ImagePlus maskImp = new ImagePlus(Filer.getPath(roiPath, "masks", baseMask));
-        Roi mask = maskImp.getRoi();
+        ImagePlus maskImp = new ImagePlus(Filer.getPath(basePath, "masks", baseMask));
+        final Roi mask = maskImp.getRoi();
         maskImp.close();
         RoiManager baseRoiManager = new RoiManager(false);
-        RoiManager altRoiManager = new RoiManager(false);
-        baseRoiManager.runCommand("Open", Filer.getPath(roiPath, "zips", "zip_"+baseLabel+".zip"));
+        final RoiManager altRoiManager = new RoiManager(false);
+        baseRoiManager.runCommand("Open", Filer.getPath(basePath, "zips", "zip_" + baseLabel + ".zip"));
 
         // Setting up output labels.
-        ImagePlus baseImp = new ImagePlus(Filer.getPath(roiPath, "labels", "label_"+baseLabel+".tif"));
+        ImagePlus baseImp = new ImagePlus(Filer.getPath(basePath, "labels", "label_" + baseLabel + ".tif"));
         ImageProcessor baseIp = baseImp.getProcessor();
         baseIp = baseImp.getProcessor();
         baseIp.setColor(0);
@@ -91,16 +108,16 @@ public class SegmentLabel extends BatchCommand {
         // Setting colours and saving.
         baseIp.setColorModel(LutLoader.getLut("glasbey on dark"));
         baseImp.setProcessor(baseIp);
-        Filer.save(baseImp, roiPath, "labels", "label_"+innerLabel+".tif");
+        Filer.save(baseImp, basePath, "labels", "label_" + innerLabel + ".tif");
         baseImp.close();
-        baseRoiManager.runCommand("Save", Filer.getSavePath(roiPath, "zips", "zip_"+innerLabel+".zip"));
+        baseRoiManager.runCommand("Save", Filer.getPath(basePath, "zips", "zip_" + innerLabel + ".zip"));
         baseRoiManager.close();
 
         altIp.setColorModel(LutLoader.getLut("glasbey on dark"));
         altImp.setProcessor(altIp);
-        Filer.save(altImp, roiPath, "labels", "label_"+outerLabel+".tif");
+        Filer.save(altImp, basePath, "labels", "label_" + outerLabel + ".tif");
         altImp.close();
-        altRoiManager.runCommand("Save", Filer.getSavePath(roiPath, "zips", "zip_"+outerLabel+".zip"));
+        altRoiManager.runCommand("Save", Filer.getPath(basePath, "zips", "zip_" + outerLabel + ".zip"));
         altRoiManager.close();
     }
 
