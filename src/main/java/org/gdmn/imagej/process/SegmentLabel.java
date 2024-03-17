@@ -1,5 +1,6 @@
 package org.gdmn.imagej.process;
 
+import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.Roi;
 import ij.plugin.LutLoader;
@@ -74,6 +75,10 @@ public class SegmentLabel extends BatchCommand {
         // Opening mask and roi managers.
         ImagePlus maskImp = new ImagePlus(Filer.getPath(basePath, "masks", baseMask));
         final Roi mask = maskImp.getRoi();
+        if (mask == null) {
+            IJ.log("Mask not found: " + baseMask);
+            return;
+        }
         maskImp.close();
         RoiManager baseRoiManager = new RoiManager(false);
         final RoiManager altRoiManager = new RoiManager(false);
