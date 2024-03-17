@@ -1,5 +1,13 @@
 package org.gdmn.imagej.process;
 
+import ij.IJ;
+import ij.ImagePlus;
+import ij.gui.Roi;
+import ij.measure.Measurements;
+import ij.plugin.LutLoader;
+import ij.plugin.frame.RoiManager;
+import ij.process.ImageConverter;
+import ij.process.ImageProcessor;
 import org.gdmn.imagej.utils.BatchCommand;
 import org.gdmn.imagej.utils.Defaults;
 import org.gdmn.imagej.utils.Filer;
@@ -10,18 +18,12 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.widget.Button;
 
-import ij.IJ;
-import ij.ImagePlus;
-import ij.gui.Roi;
-import ij.measure.Measurements;
-import ij.plugin.LutLoader;
-import ij.plugin.frame.RoiManager;
-import ij.process.ImageConverter;
-import ij.process.ImageProcessor;
-
+/**
+ * Command to run StarDist nuclei individualisation.
+ */
 @Plugin(type = Command.class, label = "Nuclear Individualisation", menu = {
-    @Menu(label = "2D Macro Tool"),
-    @Menu(label = "Nuclear Individualisation", weight = 4)
+        @Menu(label = "2D Macro Tool"),
+        @Menu(label = "Nuclear Individualisation", weight = 4)
 })
 public class NuclearClassification extends BatchCommand {
 
@@ -29,16 +31,16 @@ public class NuclearClassification extends BatchCommand {
     private String header = "<h2 style='width: 500px'>Batch StarDist</h2>";
 
     @Parameter(label = "Percentile low", persist = false, style = "slider, format:#.#   ", min = "0", max = "100", stepSize = "0.1")
-    private Double percentileLow = Double.parseDouble(Defaults.get("percentileLow", "1.0"));
+    private double percentileLow = Double.parseDouble(Defaults.get("percentileLow", "1.0"));
 
     @Parameter(label = "Percentile high", persist = false, style = "slider, format:#.#", min = "0", max = "100", stepSize = "0.1")
-    private Double percentileHigh = Double.parseDouble(Defaults.get("percentileHigh", "99.8"));
+    private double percentileHigh = Double.parseDouble(Defaults.get("percentileHigh", "99.8"));
 
     @Parameter(label = "Probability Threshold", persist = false, style = "slider, format:#.##", min = "0", max = "1", stepSize = "0.05")
-    private Double probabilityThreshold = Double.parseDouble(Defaults.get("probabilityThreshold", "0.5"));
+    private double probabilityThreshold = Double.parseDouble(Defaults.get("probabilityThreshold", "0.5"));
 
     @Parameter(label = "Overlap Threshold", persist = false, style = "slider, format:#.##", min = "0", max = "1", stepSize = "0.05")
-    private Double overlapThreshold = Double.parseDouble(Defaults.get("overlapThreshold", "0.4"));
+    private double overlapThreshold = Double.parseDouble(Defaults.get("overlapThreshold", "0.4"));
 
     @Parameter(label = "Area Threshold (µm^2)", persist = false, style = "slider", min = "0", max = "150", stepSize = "1")
     private int areaThreshold = Integer.parseInt(Defaults.get("areaThreshold", "10"));
@@ -46,8 +48,24 @@ public class NuclearClassification extends BatchCommand {
     @Parameter(label = "Run", callback = "runAll")
     private Button runButton;
 
-    public void process(String roiPath) {
-        ImagePlus imp = new ImagePlus(Filer.getPath(roiPath, "channels", "nuclei.tif"));
+    public void process(String basePath) {
+        this.individualiseNuclei(basePath, percentileLow, percentileHigh, probabilityThreshold, overlapThreshold,
+                areaThreshold);
+    }
+
+    /**
+     * Runs StarDist nuclear segmentation on the nuclei.tif image.
+     *
+     * @param basePath             the path to the image folder.
+     * @param percentileLow        StarDist percentile low.
+     * @param percentileHigh       StarDist percentile high.
+     * @param probabilityThreshold StarDist probability threshold.
+     * @param overlapThreshold     StarDist overlap threshold.
+     * @param areaThreshold        StarDist area threshold.
+     */
+    public void individualiseNuclei(String basePath, double percentileLow, double percentileHigh,
+            double probabilityThreshold, double overlapThreshold, int areaThreshold) {
+        ImagePlus imp = new ImagePlus(Filer.getPath(basePath, "channels", "nuclei.tif"));
         imp.show();
 
         // Running StarDist 2D.
@@ -55,10 +73,10 @@ public class NuclearClassification extends BatchCommand {
                 "'input':'" + imp.getTitle() + "'",
                 "'modelChoice':'Versatile (fluorescent nuclei)'",
                 "'normalizeInput':'true'",
-                "'percentileBottom':'" + percentileLow.toString() + "'",
-                "'percentileTop':'" + percentileHigh.toString() + "'",
-                "'probThresh':'" + probabilityThreshold.toString() + "'",
-                "'nmsThresh':'" + overlapThreshold.toString() + "'",
+                "'percentileBottom':'" + percentileLow + "'",
+                "'percentileTop':'" + percentileHigh + "'",
+                "'probThresh':'" + probabilityThreshold + "'",
+                "'nmsThresh':'" + overlapThreshold + "'",
                 "'outputType':'ROI Manager'",
                 "'nTiles':'1'",
                 "'excludeBoundary':'2'",
@@ -85,7 +103,7 @@ public class NuclearClassification extends BatchCommand {
         // Getting thresholded rois.
         for (int i = rois.length - 1; i >= 0; i--) {
             imp.setRoi(rois[i]);
-            Double area = imp.getStatistics(Measurements.AREA).area;
+            double area = imp.getStatistics(Measurements.AREA).area;
             if (area < areaThreshold) {
                 roiManager.select(i);
                 roiManager.runCommand("Delete");
@@ -111,11 +129,10 @@ public class NuclearClassification extends BatchCommand {
         ip.setColorModel(LutLoader.getLut("glasbey on dark"));
 
         // Saving and closing.
-        Filer.save(imp, roiPath, "labels", "label_roi.tif");
-        roiManager.runCommand("Save", Filer.getSavePath(roiPath, "zips", "zip_roi.zip"));
+        Filer.save(imp, basePath, "labels", "label_roi.tif");
+        roiManager.runCommand("Save", Filer.getPath(basePath, "zips", "zip_roi.zip"));
         roiManager.close();
         imp.close();
-
     }
 
 }
