@@ -1,23 +1,5 @@
 package org.gdmn.imagej.process;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.gdmn.imagej.utils.BatchCommand;
-import org.gdmn.imagej.utils.Defaults;
-import org.gdmn.imagej.utils.Filer;
-import org.scijava.ItemVisibility;
-import org.scijava.command.Command;
-import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Menu;
-import org.scijava.plugin.Plugin;
-import org.scijava.widget.Button;
-
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.Roi;
@@ -25,11 +7,29 @@ import ij.measure.Measurements;
 import ij.plugin.frame.RoiManager;
 import ij.process.ImageConverter;
 import ij.process.ImageProcessor;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import org.gdmn.imagej.utils.BatchCommand;
+import org.gdmn.imagej.utils.Defaults;
+import org.gdmn.imagej.utils.Filer;
+import org.scijava.ItemVisibility;
+import org.scijava.command.Command;
+import org.scijava.plugin.Menu;
+import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
+import org.scijava.widget.Button;
 
-
+/**
+ * Command to generate quantifications.
+ */
 @Plugin(type = Command.class, label = "Extract Quantifications", menu = {
-    @Menu(label = "2D Macro Tool"),
-    @Menu(label = "Extract Quantifications", weight = 7)
+        @Menu(label = "2D Macro Tool"),
+        @Menu(label = "Extract Quantifications", weight = 7)
 })
 public class Quantify extends BatchCommand {
 
@@ -42,23 +42,27 @@ public class Quantify extends BatchCommand {
     @Parameter(label = "Run", callback = "runAll")
     private Button runButton;
 
-    public void process(String roiPath) {
+    /**
+     * Extracts and saves quantifications for an image folder and saves marker
+     * labels.
+     */
+    public void process(String basePath) {
         // Initialising output file.
-        List<String> data = new ArrayList<>();
-
-        // Opening intensity image.
-        ImagePlus imp = new ImagePlus(Filer.getPath(roiPath, "channels", "marker.tif"));
+        final List<String> data = new ArrayList<>();
 
         // Opening label image.
-        ImagePlus labelImp = new ImagePlus(Filer.getPath(roiPath, "labels", "label_roi.tif"));
+        ImagePlus labelImp = new ImagePlus(Filer.getPath(basePath, "labels", "label_roi.tif"));
         ImageConverter converter = new ImageConverter(labelImp);
         converter.convertToGray8();
         ImageProcessor labelIp = labelImp.getProcessor();
         labelIp.setColor(0);
         labelIp.fill();
 
+        // Opening intensity image.
+        ImagePlus imp = new ImagePlus(Filer.getPath(basePath, "channels", "marker.tif"));
+
         // Getting list of zips.
-        File dir = new File(Filer.getDir(roiPath, "zips"));
+        File dir = new File(Filer.getPath(basePath, "zips", ""));
         File[] files = dir.listFiles();
         for (File file : files) {
             String filePath = file.getPath();
@@ -72,7 +76,7 @@ public class Quantify extends BatchCommand {
                 roiManager.runCommand("Open", filePath);
                 Roi[] rois = roiManager.getRoisAsArray();
                 // Checking intensities.
-                int nActive = 0;
+                int numberActive = 0;
                 for (int i = 0; i < rois.length; i++) {
                     imp.setRoi(rois[i]);
                     double mean = imp.getStatistics(Measurements.MEAN).mean;
@@ -80,15 +84,15 @@ public class Quantify extends BatchCommand {
                         // Set colour to red.
                         labelIp.setColor(106);
                         labelIp.fill(rois[i]);
-                        nActive += 1;
+                        numberActive += 1;
                     } else {
                         // Set colour to blue.
                         labelIp.setColor(46);
                         labelIp.fill(rois[i]);
                     }
                 }
-                Filer.save(labelImp, roiPath, "marker", "marker_" + fileName + ".tif");
-                data.add(fileName + "=" + nActive + "/" + rois.length);
+                Filer.save(labelImp, basePath, "marker", "marker_" + fileName + ".tif");
+                data.add(fileName + "=" + numberActive + "/" + rois.length);
                 roiManager.close();
             }
         }
@@ -98,7 +102,7 @@ public class Quantify extends BatchCommand {
         labelImp.close();
 
         // Getting mask areas.
-        dir = new File(Filer.getDir(roiPath, "masks"));
+        dir = new File(Filer.getPath(basePath, "masks", ""));
         files = dir.listFiles();
         for (File file : files) {
             String filePath = file.getPath();
@@ -111,7 +115,7 @@ public class Quantify extends BatchCommand {
         }
 
         // Writing data.
-        Path dataPath = Paths.get(Filer.getPath(roiPath, "", "quant.txt"));
+        Path dataPath = Paths.get(Filer.getPath(basePath, "", "quant.txt"));
         try {
             Files.write(dataPath, data);
         } catch (IOException e) {
