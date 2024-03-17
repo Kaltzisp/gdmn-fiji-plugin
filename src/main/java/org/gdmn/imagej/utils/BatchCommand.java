@@ -5,6 +5,7 @@ import ij.io.DirectoryChooser;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import org.scijava.ItemVisibility;
 import org.scijava.command.Command;
@@ -16,6 +17,8 @@ import org.scijava.widget.Button;
  * Overarching BatchCommand class extended by each of the plugin commands.
  */
 public abstract class BatchCommand implements Command, Interactive {
+
+    protected String filePath;
 
     @Parameter(visibility = ItemVisibility.MESSAGE)
     private String fileChooserMessage = "<h2 style='width: 500px'>Select the parent directory and target file pattern.</h2>";
@@ -93,18 +96,24 @@ public abstract class BatchCommand implements Command, Interactive {
      * Loops through the list of selected files and runs the command on each.
      */
     public void runAll() {
+
         // Specifying self as the command instance.
         BatchCommand self = this;
         Logger.logProcess(self);
+
         // Getting target dir and files.
-        List<String> basePaths = Filer.getBasePaths(self.selectedDir, self.filePattern);
+        List<Path> basePaths = new ArrayList<Path>();
+        Filer.getBasePaths(self.selectedDir, self.filePattern)
+                .forEach(path -> basePaths.add(path));
         int n = basePaths.size();
+
         // Creating a new thread to process the images.
         Thread runThread = new Thread(new Runnable() {
             public void run() {
                 for (int i = 0; i < n; i++) {
                     IJ.showStatus("!Processing image " + (i + 1) + " of " + n + ".");
-                    self.process(basePaths.get(i));
+                    self.filePath = basePaths.get(i).toString();
+                    self.process(basePaths.get(i).getParent().toString());
                 }
                 IJ.showStatus("!Command finished: " + self.getClass().getSimpleName() + " on n=" + n + " images.");
             }

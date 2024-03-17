@@ -3,7 +3,6 @@ package org.gdmn.imagej.utils;
 import ij.IJ;
 import ij.ImagePlus;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,19 +25,19 @@ public class Filer {
      *                   for analysis.
      * @param pattern    the target regex or string pattern for the base images
      *                   (i.e. "roi.tif").
-     * @return the list of paths to each image folder.
+     * @return the list of paths to each target file.
      */
-    public static List<String> getBasePaths(String pathString, String pattern) {
-        List<String> pathList = new ArrayList<String>();
+    public static List<Path> getBasePaths(String pathString, String pattern) {
+        List<Path> filePaths = new ArrayList<Path>();
         Path parentDir = Paths.get(pathString);
         try (Stream<Path> paths = Files.walk(parentDir)) {
             paths.filter(path -> Files.isRegularFile(path))
-                    .filter(path -> path.getFileName().toString().equals(pattern))
-                    .forEach(path -> pathList.add(path.getParent().toString()));
-        } catch (IOException e) {
+                    .filter(path -> path.getFileName().toString().matches(pattern))
+                    .forEach(path -> filePaths.add(path));
+        } catch (Exception e) {
             return Collections.emptyList();
         }
-        return pathList;
+        return filePaths;
     }
 
     /**
