@@ -51,14 +51,14 @@ public class CreateMask extends BatchCommand {
     /**
      * Creates a mask from a fluorescence image (single-channel).
      *
-     * @param basePath the path to the image folder.
-     * @param channel the name of the channel to create a mask from.
-     * @param multiplier the degree of amplification.
+     * @param basePath      the path to the image folder.
+     * @param channel       the name of the channel to create a mask from.
+     * @param multiplier    the degree of amplification.
      * @param meadianRadius the radius to apply for the median filter.
      * @param closingRadius the radius to apply for the closing filter.
-     * @param maskName the name of the output mask.
      */
-    private void createMask(String basePath, String channel, double multiplier, double medianRadius, int closingRadius) {
+    private void createMask(String basePath, String channel, double multiplier, double medianRadius,
+            int closingRadius) {
 
         // Opening image and getting processor.
         String imagePath = Filer.getPath(basePath, "channels", channel + ".tif");

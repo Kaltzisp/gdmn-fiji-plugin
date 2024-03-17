@@ -45,7 +45,7 @@ public class Filer {
      * Saves an IJ image to the specified location.
      *
      * @param imp       the ImagePlus object to be saved.
-     * @param basePath   the path to the image folder.
+     * @param basePath  the path to the image folder.
      * @param subFolder the sub-folder to save to.
      * @param fileName  the file name to save as.
      */

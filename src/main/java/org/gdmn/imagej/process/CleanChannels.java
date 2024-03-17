@@ -22,7 +22,8 @@ import org.scijava.widget.Button;
 import org.scijava.widget.NumberWidget;
 
 /**
- * Command to split fluorescence image into distinct channels with minimal crosstalk.
+ * Command to split fluorescence image into distinct channels with minimal
+ * crosstalk.
  */
 @Plugin(type = Command.class, label = "Clean Channels", menu = {
         @Menu(label = "2D Macro Tool"),
@@ -59,8 +60,10 @@ public class CleanChannels extends BatchCommand {
     /**
      * Splits a fluorescence image into cleaned output channels.
      *
-     * @param basePath the path to the image folder.
-     * @param roiName  the name of the image file.
+     * @param basePath             the path to the image folder.
+     * @param roiName              the name of the image file.
+     * @param channelNames         an array of the channel names.
+     * @param crosstalkSuppression the degree of crosstalk suppression to use.
      */
     private void cleanChannels(String basePath, String roiName, String[] channelNames, double crosstalkSuppression) {
 

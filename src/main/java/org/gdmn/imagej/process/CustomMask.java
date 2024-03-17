@@ -1,14 +1,5 @@
 package org.gdmn.imagej.process;
 
-import org.gdmn.imagej.utils.BatchCommand;
-import org.gdmn.imagej.utils.Defaults;
-import org.gdmn.imagej.utils.Filer;
-import org.scijava.ItemVisibility;
-import org.scijava.command.Command;
-import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
-import org.scijava.widget.Button;
-
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.Roi;
@@ -16,11 +7,22 @@ import ij.gui.Toolbar;
 import ij.gui.WaitForUserDialog;
 import ij.plugin.filter.ThresholdToSelection;
 import ij.process.ImageProcessor;
+import org.gdmn.imagej.utils.BatchCommand;
+import org.gdmn.imagej.utils.Defaults;
+import org.gdmn.imagej.utils.Filer;
+import org.scijava.ItemVisibility;
+import org.scijava.command.Command;
 import org.scijava.plugin.Menu;
+import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
+import org.scijava.widget.Button;
 
+/**
+ * Command to draw custom masks from a template.
+ */
 @Plugin(type = Command.class, label = "Create Custom Masks", menu = {
-    @Menu(label = "2D Macro Tool"),
-    @Menu(label = "Create Custom Masks", weight = 3)
+        @Menu(label = "2D Macro Tool"),
+        @Menu(label = "Create Custom Masks", weight = 3)
 })
 public class CustomMask extends BatchCommand {
 
@@ -42,12 +44,28 @@ public class CustomMask extends BatchCommand {
     @Parameter(label = "Run", callback = "runAll")
     private Button runButton;
 
-    public void process(String roiPath) {
-        String filePath = roiPath;
-        if (this.templateType.equals("Channel") && templateTissue != "-") {
-            filePath = Filer.getPath(roiPath, "channels", this.templateTissue + ".tif");
-        } else if (this.templateType.equals("Mask") && templateTissue != "-") {
-            filePath = Filer.getPath(roiPath, "masks", "mask_" + this.templateTissue + ".tif");
+    public void process(String basePath) {
+        this.drawCustomMask(basePath, this.templateType, this.templateTissue, this.outputMask,
+                this.createTrabecularMask);
+    }
+
+    /**
+     * Draw a custom mask on a template image, saving the mask and its reverse.
+     *
+     * @param basePath             the path to the image folder.
+     * @param templateType         the type of template (Entire ROI / Channel /
+     *                             Mask).
+     * @param templateTissue       the template tissue.
+     * @param outputMask           the name of the created mask.
+     * @param createTrabecularMask boolean option to create reverse mask.
+     */
+    public void drawCustomMask(String basePath, String templateType, String templateTissue, String outputMask,
+            boolean createTrabecularMask) {
+        String filePath = basePath;
+        if (templateType.equals("Channel") && templateTissue != "-") {
+            filePath = Filer.getPath(basePath, "channels", templateTissue + ".tif");
+        } else if (templateType.equals("Mask") && templateTissue != "-") {
+            filePath = Filer.getPath(basePath, "masks", "mask_" + templateTissue + ".tif");
         }
 
         // Opening drawing template and requesting drawing.
@@ -63,7 +81,7 @@ public class CustomMask extends BatchCommand {
 
         if (!templateTissue.equals("-")) {
             // If template tissue, combine template with selection.
-            mask = new ImagePlus(Filer.getPath(roiPath, "masks", "mask_" + templateTissue + ".tif"));
+            mask = new ImagePlus(Filer.getPath(basePath, "masks", "mask_" + templateTissue + ".tif"));
             Roi roi = imp.getRoi();
             imp.close();
             maskIp = mask.getProcessor();
@@ -82,21 +100,20 @@ public class CustomMask extends BatchCommand {
         mask.setRoi(ThresholdToSelection.run(mask));
 
         // Saving and closing.
-        Filer.save(mask, roiPath, "masks", outputMask);
+        Filer.save(mask, basePath, "masks", outputMask);
 
         if (createTrabecularMask) {
             Roi roi = mask.getRoi();
             ImagePlus trabecularMask = new ImagePlus(
-                    Filer.getPath(roiPath, "masks", "mask_" + templateTissue + ".tif"));
+                    Filer.getPath(basePath, "masks", "mask_" + templateTissue + ".tif"));
             ImageProcessor trabIp = trabecularMask.getProcessor();
             trabIp.fill(roi);
             trabIp.setThreshold(255, 255, ImageProcessor.NO_LUT_UPDATE);
             trabecularMask.setRoi(ThresholdToSelection.run(trabecularMask));
-            Filer.save(trabecularMask, roiPath, "masks", "mask_myo_trabecular.tif");
+            Filer.save(trabecularMask, basePath, "masks", "mask_myo_trabecular.tif");
             trabecularMask.close();
         }
 
         mask.close();
-
     }
 }
