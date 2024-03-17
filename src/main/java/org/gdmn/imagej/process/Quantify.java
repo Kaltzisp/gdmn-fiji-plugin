@@ -23,6 +23,7 @@ import org.scijava.plugin.Menu;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.widget.Button;
+import org.scijava.widget.NumberWidget;
 
 /**
  * Command to generate quantifications.
@@ -32,21 +33,106 @@ import org.scijava.widget.Button;
         @Menu(label = "Analyze Marker", weight = 7)
 })
 public class Quantify extends BatchCommand {
+    private ImagePlus intensityImp;
+    private ImagePlus activityImp;
+    private RoiManager roiManager;
 
     @Parameter(visibility = ItemVisibility.MESSAGE)
     private String header = "<h2 style='width: 500px'>Generate quantifications</h2>";
 
-    @Parameter(label = "Threshold:")
-    private double markerthreshold = Double.parseDouble(Defaults.get("markerthreshold", "0.30"));
+    @Parameter(label = "Threshold:", style = "slider, format:#.###", min = "0", max = "1", stepSize = "0.025", callback = "updatePreview")
+    private double markerThreshold = Double.parseDouble(Defaults.get("markerThreshold", "0.3"));
+
+    @Parameter(label = "Show preview:", callback = "showPreview")
+    private boolean showPreview = false;
 
     @Parameter(label = "Run", callback = "runAll")
     private Button runButton;
+
+    /**
+     * Shows a preview of the thresholded marker image.
+     */
+    public void showPreview() {
+        if (this.showPreview) {
+
+            // Getting preview image.
+            String previewDir = Filer.getBasePaths(this.selectedDir, this.filePattern).get(0).getParent().toString();
+
+            // Opening ROI Manager and images.
+            this.roiManager = new RoiManager(false);
+            this.roiManager.runCommand("Open", Filer.getPath(previewDir, "zips", "zip_roi.zip"));
+            this.intensityImp = new ImagePlus(Filer.getPath(previewDir, "channels", "marker.tif"));
+            this.activityImp = new ImagePlus(Filer.getPath(previewDir, "labels", "label_roi.tif"));
+            ImageConverter converter = new ImageConverter(this.activityImp);
+            converter.convertToGray8();
+
+            // Getting image dimensions.
+            double screenWidth = IJ.getScreenSize().getWidth();
+            double screenHeight = IJ.getScreenSize().getHeight();
+            int impWidth = this.intensityImp.getWidth();
+            int impHeight = this.intensityImp.getHeight();
+            double scale = 1 / Math.max(2 * impWidth / screenWidth, 2 * impHeight / screenHeight);
+
+            // Showing images.
+            this.intensityImp.show();
+            this.intensityImp.getWindow().setLocationAndSize((int) (screenWidth / 2 - impWidth * scale),
+                    (int) (screenHeight / 2 - 100), (int) (impWidth * scale), (int) (impHeight * scale));
+            this.activityImp.show();
+            this.activityImp.getWindow().setLocationAndSize((int) (screenWidth / 2),
+                    (int) (screenHeight / 2 - 100), (int) (impWidth * scale), (int) (impHeight * scale));
+            updatePreview();
+
+        } else {
+            this.closePreview();
+        }
+    }
+
+    private void closePreview() {
+        if (this.roiManager != null) {
+            this.roiManager.close();
+        }
+        if (this.intensityImp != null) {
+            this.intensityImp.close();
+        }
+        if (this.activityImp != null) {
+            this.activityImp.close();
+        }
+    }
+
+    /**
+     * Updates the preview image.
+     */
+    public void updatePreview() {
+        Roi roi = this.intensityImp.getRoi();
+        if (this.intensityImp.isVisible() && this.activityImp.isVisible()) {
+            Roi[] rois = this.roiManager.getRoisAsArray();
+            // Checking intensities.
+            for (int i = 0; i < rois.length; i++) {
+                this.intensityImp.setRoi(rois[i]);
+                ImageProcessor ip = this.activityImp.getProcessor();
+                double mean = this.intensityImp.getStatistics(Measurements.MEAN).mean;
+                if (mean > markerThreshold * 255) {
+                    // Set colour to red.
+                    ip.setColor(106);
+                    ip.fill(rois[i]);
+                } else {
+                    // Set colour to blue.
+                    ip.setColor(46);
+                    ip.fill(rois[i]);
+                }
+            }
+        }
+        this.activityImp.updateAndDraw();
+        this.intensityImp.setRoi(roi);
+    }
 
     /**
      * Extracts and saves quantifications for an image folder and saves marker
      * labels.
      */
     public void process(String basePath) {
+        this.closePreview();
+
         // Initialising output file.
         final List<String> data = new ArrayList<>();
 
@@ -80,7 +166,7 @@ public class Quantify extends BatchCommand {
                 for (int i = 0; i < rois.length; i++) {
                     imp.setRoi(rois[i]);
                     double mean = imp.getStatistics(Measurements.MEAN).mean;
-                    if (mean > markerthreshold * 255) {
+                    if (mean > markerThreshold * 255) {
                         // Set colour to red.
                         labelIp.setColor(106);
                         labelIp.fill(rois[i]);
