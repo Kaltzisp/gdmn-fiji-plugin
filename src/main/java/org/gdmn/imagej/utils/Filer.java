@@ -72,7 +72,7 @@ public class Filer {
     }
 
     /**
-     * Deletes an file from the specified location.
+     * Deletes a file from the specified location.
      *
      * @param basePath  the path to the image folder.
      * @param subFolder the name of the subfolder.
