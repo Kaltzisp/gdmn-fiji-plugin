@@ -13,6 +13,7 @@ import java.util.List;
 import org.gdmn.imagej.utils.BatchCommand;
 import org.gdmn.imagej.utils.Defaults;
 import org.gdmn.imagej.utils.Filer;
+import org.gdmn.imagej.utils.Logger;
 import org.scijava.ItemVisibility;
 import org.scijava.command.Command;
 import org.scijava.plugin.Menu;
@@ -72,6 +73,15 @@ public class CleanChannels extends BatchCommand {
         ImagePlus imp = new ImagePlus(roiPath);
         ImageConverter ic = new ImageConverter(imp);
         ic.convertToGray8();
+
+        // Checking for channel number.
+        int numChannels = imp.getNChannels();
+        if (numChannels < 4 && !channelNames[3].equals("-")) {
+            Logger.warn("Only " + numChannels + " channels found for image " + roiPath);
+            for (int i = numChannels; i < channelNames.length; i++) {
+                channelNames[i] = "-";
+            }
+        }
 
         // Splitting image into channels and getting channel indexes.
         ImagePlus[] imps = ChannelSplitter.split(imp);
