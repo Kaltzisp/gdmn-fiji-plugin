@@ -39,7 +39,7 @@ public class Quantify extends BatchCommand {
     @Parameter(visibility = ItemVisibility.MESSAGE)
     private String header = "<h2 style='width: 500px'>Generate quantifications</h2>";
 
-    @Parameter(label = "Threshold:", style = "slider, format:#.###", min = "0", max = "1", stepSize = "0.025", callback = "updatePreview")
+    @Parameter(label = "Threshold:", style = "slider, format:#.####", min = "0", max = "1", stepSize = "0.0125", callback = "updatePreview")
     private double markerThreshold = Double.parseDouble(Defaults.get("markerThreshold", "0.3"));
 
     @Parameter(label = "Show preview:", callback = "showPreview")
