@@ -17,6 +17,7 @@ import java.util.List;
 import org.gdmn.imagej.utils.BatchCommand;
 import org.gdmn.imagej.utils.Defaults;
 import org.gdmn.imagej.utils.Filer;
+import org.gdmn.imagej.utils.Masks;
 import org.scijava.ItemVisibility;
 import org.scijava.command.Command;
 import org.scijava.plugin.Menu;
@@ -191,11 +192,27 @@ public class Quantify extends BatchCommand {
         files = dir.listFiles();
         for (File file : files) {
             String filePath = file.getPath();
-            String fileType = file.getName().substring(0, 4);
+            String[] fileName = file.getName().split("_");
+            String fileType = fileName[0];
+
             if (fileType.equals("mask")) {
+                // If mask get the entire area.
                 imp = new ImagePlus(filePath);
                 data.add(file.getName() + "=" + imp.getStatistics(Measurements.AREA).area);
                 imp.close();
+
+            } else if (fileType.equals("sublayer")) {
+                // If sublayer, combine with masks first.
+                ImagePlus sublayer = new ImagePlus(filePath);
+                ImagePlus myo = new ImagePlus(Filer.getPath(basePath, "masks", "mask_myo.tif"));
+                ImagePlus endo = new ImagePlus(Filer.getPath(basePath, "masks", "mask_endo.tif"));
+                myo = Masks.and(sublayer, myo);
+                data.add(file.getName() + "(myo)=" + myo.getStatistics(Measurements.AREA).area);
+                endo = Masks.and(sublayer, endo);
+                data.add(file.getName() + "(endo)=" + endo.getStatistics(Measurements.AREA).area);
+                sublayer.close();
+                myo.close();
+                endo.close();
             }
         }
 
