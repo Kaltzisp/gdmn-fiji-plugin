@@ -29,7 +29,7 @@ import org.scijava.widget.Button;
  */
 @Plugin(type = Command.class, menu = {
         @Menu(label = "2D Macro Tool"),
-        @Menu(label = "Analyze Marker", weight = 7)
+        @Menu(label = "Analyze Marker", weight = 27)
 })
 public class Quantify extends BatchCommand {
     private ImagePlus intensityImp;

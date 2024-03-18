@@ -21,7 +21,7 @@ import org.scijava.widget.Button;
  */
 @Plugin(type = Command.class, menu = {
         @Menu(label = "2D Macro Tool"),
-        @Menu(label = "Select Roi", weight = 0)
+        @Menu(label = "Select Roi", weight = 20)
 })
 public class SelectRoi extends BatchCommand {
     @Parameter(visibility = ItemVisibility.MESSAGE)

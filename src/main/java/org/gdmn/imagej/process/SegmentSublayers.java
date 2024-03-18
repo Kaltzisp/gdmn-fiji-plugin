@@ -21,7 +21,7 @@ import org.scijava.widget.Button;
  */
 @Plugin(type = Command.class, menu = {
         @Menu(label = "2D Macro Tool"),
-        @Menu(label = "Segment Sublayers", weight = 6)
+        @Menu(label = "Segment Sublayers", weight = 26)
 })
 public class SegmentSublayers extends BatchCommand {
     @Parameter(visibility = ItemVisibility.MESSAGE)

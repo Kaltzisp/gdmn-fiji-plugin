@@ -21,7 +21,7 @@ import org.scijava.widget.Button;
  */
 @Plugin(type = Command.class, menu = {
         @Menu(label = "2D Macro Tool"),
-        @Menu(label = "Segment Label", weight = 5)
+        @Menu(label = "Segment Label", weight = 25)
 })
 public class SegmentLabel extends BatchCommand {
 

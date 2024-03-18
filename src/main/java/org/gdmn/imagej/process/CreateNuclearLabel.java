@@ -23,7 +23,7 @@ import org.scijava.widget.Button;
  */
 @Plugin(type = Command.class, menu = {
         @Menu(label = "2D Macro Tool"),
-        @Menu(label = "Create Nuclear Label", weight = 4)
+        @Menu(label = "Create Nuclear Label", weight = 24)
 })
 public class CreateNuclearLabel extends BatchCommand {
 

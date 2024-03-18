@@ -27,7 +27,7 @@ import org.scijava.widget.NumberWidget;
  */
 @Plugin(type = Command.class, menu = {
         @Menu(label = "2D Macro Tool"),
-        @Menu(label = "Clean Channels", weight = 1)
+        @Menu(label = "Clean Channels", weight = 21)
 })
 public class CleanChannels extends BatchCommand {
 

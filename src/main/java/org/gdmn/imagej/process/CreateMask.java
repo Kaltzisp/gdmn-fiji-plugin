@@ -22,7 +22,7 @@ import org.scijava.widget.Button;
  */
 @Plugin(type = Command.class, menu = {
         @Menu(label = "2D Macro Tool"),
-        @Menu(label = "Create Masks", weight = 2)
+        @Menu(label = "Create Masks", weight = 22)
 })
 public class CreateMask extends BatchCommand {
 

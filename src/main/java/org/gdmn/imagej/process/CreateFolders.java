@@ -19,7 +19,7 @@ import org.scijava.widget.Button;
  */
 @Plugin(type = Command.class, menu = {
         @Menu(label = "2D Macro Tool"),
-        @Menu(label = "Create Folders", weight = -10)
+        @Menu(label = "Create Folders", weight = 1)
 })
 public class CreateFolders extends BatchCommand {
 
