@@ -24,7 +24,7 @@ import org.scijava.widget.Button;
 public class CreateFolders extends BatchCommand {
 
     @Parameter(visibility = ItemVisibility.MESSAGE)
-    private String header = "<h2 style='width: 500px'>Clean channels</h2>";
+    private String header = "<h2 style='width: 500px'>Create folder hierarchy</h2>";
 
     @Parameter(label = "Delimiter")
     private String delimiter = Defaults.get("delimiter", "-");
