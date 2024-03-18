@@ -61,4 +61,13 @@ public class Logger {
         }
         return logDirString;
     }
+
+    public static void warn(String message) {
+        IJ.log("WARNING: " + message);
+    }
+
+    public static void error(String message) {
+        IJ.log("ERROR: " + message);
+    }
+
 }
