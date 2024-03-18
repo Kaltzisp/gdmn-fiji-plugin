@@ -96,6 +96,8 @@ public abstract class BatchCommand implements Command, Interactive {
      * Loops through the list of selected files and runs the command on each.
      */
     public void runAll() {
+        Defaults.set("dir", this.selectedDir);
+        Defaults.set("filePattern", this.filePattern);
 
         // Specifying self as the command instance.
         BatchCommand self = this;
