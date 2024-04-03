@@ -3,7 +3,6 @@ package org.gdmn.imagej.process;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.Roi;
-import ij.gui.WaitForUserDialog;
 import ij.plugin.LutLoader;
 import ij.plugin.filter.ThresholdToSelection;
 import ij.plugin.frame.RoiManager;
