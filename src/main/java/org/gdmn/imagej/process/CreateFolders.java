@@ -26,6 +26,12 @@ public class CreateFolders extends BatchCommand {
     @Parameter(visibility = ItemVisibility.MESSAGE)
     private String header = "<h2 style='width: 500px'>Create folder hierarchy</h2>";
 
+    @Parameter(visibility = ItemVisibility.MESSAGE)
+    private String info = "Creates a folder hierarchy from a set of image files. "
+            + "Images should all be within the same folder and named in the style below:<br><br>"
+            + "<b>IMAGING_INFO-STAGE-TEST_GROUP-EMBRYO_NUMBER-REGION-SECTION.tif</b><br>"
+            + "PK_IF5_Batch_1-E11.5-KLF8_WT-Embryo_32-LV-001.tif";
+
     @Parameter(label = "Delimiter")
     private String delimiter = Defaults.get("delimiter", "-");
 
