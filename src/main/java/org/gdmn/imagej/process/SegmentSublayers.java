@@ -44,20 +44,20 @@ public class SegmentSublayers extends BatchCommand {
         if (numSublayers == 2) {
             SegmentLabel.segmentLabel(basePath, "sublayer_myo_trabecular_1.tif", "myo_trabecular",
                     "myo_trabecular_base",
-                    "myo_trabecular_apex");
+                    "myo_trabecular_apex", false);
             SegmentLabel.segmentLabel(basePath, "sublayer_myo_trabecular_1.tif", "endo", "endo_base",
-                    "endo_apex");
+                    "endo_apex", false);
         } else if (numSublayers == 3) {
             SegmentLabel.segmentLabel(basePath, "sublayer_myo_trabecular_1.tif", "myo_trabecular",
                     "myo_trabecular_base",
-                    "tmp_middle_apex");
+                    "tmp_middle_apex", false);
             SegmentLabel.segmentLabel(basePath, "sublayer_myo_trabecular_2.tif", "tmp_middle_apex",
                     "myo_trabecular_middle",
-                    "myo_trabecular_apex");
+                    "myo_trabecular_apex", false);
             SegmentLabel.segmentLabel(basePath, "sublayer_myo_trabecular_1.tif", "endo", "endo_base",
-                    "tmp_middle_apex");
+                    "tmp_middle_apex", false);
             SegmentLabel.segmentLabel(basePath, "sublayer_myo_trabecular_2.tif", "tmp_middle_apex", "endo_middle",
-                    "endo_apex");
+                    "endo_apex", false);
             Filer.delete(basePath, "labels", "label_tmp_middle_apex.tif");
             Filer.delete(basePath, "zips", "zip_tmp_middle_apex.zip");
         }
