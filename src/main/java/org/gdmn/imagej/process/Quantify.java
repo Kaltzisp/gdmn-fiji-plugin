@@ -178,7 +178,8 @@ public class Quantify extends BatchCommand {
                     }
                 }
                 Filer.save(labelImp, basePath, "marker", "marker_" + fileName + ".tif");
-                data.add(fileName + "=" + numberActive + "/" + rois.length);
+                data.add("count_" + fileName + "_active=" + numberActive);
+                data.add("count_" + fileName + "_total=" + rois.length);
                 roiManager.close();
             }
         }
@@ -217,7 +218,7 @@ public class Quantify extends BatchCommand {
         }
 
         // Writing data.
-        Path dataPath = Paths.get(Filer.getPath(basePath, "", "quant.txt"));
+        Path dataPath = Paths.get(Filer.getPath(basePath, "", "data.txt"));
         try {
             Files.write(dataPath, data);
         } catch (IOException e) {
