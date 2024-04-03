@@ -32,7 +32,7 @@ public class Filer {
         Path parentDir = Paths.get(pathString);
         try (Stream<Path> paths = Files.walk(parentDir)) {
             paths.filter(path -> Files.isRegularFile(path))
-                    .filter(path -> path.getFileName().toString().matches(pattern))
+                    .filter(path -> path.getFileName().toString().matches(pattern.replace("*", ".*")))
                     .forEach(path -> filePaths.add(path));
         } catch (Exception e) {
             return Collections.emptyList();
