@@ -3,7 +3,9 @@ package org.gdmn.imagej.process;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.Roi;
+import ij.gui.WaitForUserDialog;
 import ij.plugin.LutLoader;
+import ij.plugin.filter.ThresholdToSelection;
 import ij.plugin.frame.RoiManager;
 import ij.process.ImageProcessor;
 import org.gdmn.imagej.utils.BatchCommand;
@@ -31,7 +33,8 @@ public class SegmentLabel extends BatchCommand {
     @Parameter(label = "Segmentation", choices = {
             "roi -> myo/endo",
             "myo -> compact/trabecular",
-            "endo -> endo/epi"
+            "endo -> endo/epi",
+            "endo -> endo/coronary"
     })
     private String segmentationType = Defaults.get("segmentationType", "roi -> myo/endo");
 
@@ -43,11 +46,13 @@ public class SegmentLabel extends BatchCommand {
      */
     public void process(String basePath) {
         if (segmentationType.equals("roi -> myo/endo")) {
-            segmentLabel(basePath, "mask_myo.tif", "roi", "myo", "endo");
+            segmentLabel(basePath, "mask_myo.tif", "roi", "myo", "endo", false);
         } else if (segmentationType.equals("myo -> compact/trabecular")) {
-            segmentLabel(basePath, "mask_myo_compact.tif", "myo", "myo_compact", "myo_trabecular");
+            segmentLabel(basePath, "mask_myo_compact.tif", "myo", "myo_compact", "myo_trabecular", false);
         } else if (segmentationType.equals("endo -> endo/epi")) {
-            segmentLabel(basePath, "mask_endo.tif", "endo", "endo", "epi");
+            segmentLabel(basePath, "mask_epi.tif", "endo", "epi", "endo", false);
+        } else if (segmentationType.equals("endo -> endo/coronary")) {
+            segmentLabel(basePath, "mask_myo_compact.tif", "endo", "coronaries", "endo", true);
         }
     }
 
@@ -61,14 +66,26 @@ public class SegmentLabel extends BatchCommand {
      * @param outerLabel the name of the output outer label.
      */
     public static void segmentLabel(String basePath, String baseMask, String baseLabel, String innerLabel,
-            String outerLabel) {
+            String outerLabel, boolean closeMask) {
         // Opening mask and roi managers.
         ImagePlus maskImp = new ImagePlus(Filer.getPath(basePath, "masks", baseMask));
-        final Roi mask = maskImp.getRoi();
+        Roi mask;
+        if (closeMask) {
+            maskImp.killRoi();
+            IJ.run(maskImp, "Fill Holes", "");
+            maskImp.getProcessor().setThreshold(255, 255, ImageProcessor.NO_LUT_UPDATE);
+            mask = ThresholdToSelection.run(maskImp);
+        } else {
+            mask = maskImp.getRoi();
+        }
         if (mask == null) {
             IJ.log("Mask not found: " + baseMask);
             return;
         }
+        // maskImp.setRoi(mask);
+        // maskImp.show();
+        // WaitForUserDialog dialog = new WaitForUserDialog("Draw mask", "Select mask then hit OK.");
+        // dialog.show();
         maskImp.close();
         RoiManager baseRoiManager = new RoiManager(false);
         final RoiManager altRoiManager = new RoiManager(false);
