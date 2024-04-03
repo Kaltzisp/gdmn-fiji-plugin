@@ -29,7 +29,7 @@ public class DrawCustomMask extends BatchCommand {
     @Parameter(visibility = ItemVisibility.MESSAGE)
     private String header = "<h2 style='width: 500px'>Draw Custom Mask</h2>";
 
-    @Parameter(label = "Template type", persist = false, choices = { "Entire ROI", "Channel", "Mask" })
+    @Parameter(label = "Template type", persist = false, choices = { "Entire ROI", "Channel", "Mask", "Label" })
     private String templateType = Defaults.get("templateType", "Mask");
 
     @Parameter(label = "Template tissue", persist = false, choices = { "myo", "endo", "marker", "nuclei", "-" })
@@ -66,10 +66,17 @@ public class DrawCustomMask extends BatchCommand {
             filePath = Filer.getPath(basePath, "channels", templateTissue + ".tif");
         } else if (templateType.equals("Mask") && templateTissue != "-") {
             filePath = Filer.getPath(basePath, "masks", "mask_" + templateTissue + ".tif");
+        } else if (templateType.equals("Label") && templateTissue != "-") {
+            filePath = Filer.getPath(basePath, "labels", "label_" + templateTissue + ".tif");
         }
 
-        // Opening drawing template and requesting drawing.
+        // Opening drawing template and guide mask and requesting drawing.
         ImagePlus imp = new ImagePlus(filePath);
+        ImageProcessor ip = imp.getProcessor();
+        ip.setColor(255);
+        ImagePlus guideMask = new ImagePlus(Filer.getPath(basePath, "Masks", "mask_myo.tif"));
+        guideMask.getRoi().drawPixels(ip);
+        guideMask.close();
         imp.killRoi();
         imp.show();
         IJ.setTool(Toolbar.POLYGON);
@@ -79,8 +86,9 @@ public class DrawCustomMask extends BatchCommand {
         ImagePlus mask;
         ImageProcessor maskIp;
 
-        if (!templateTissue.equals("-")) {
-            // If template tissue, combine template with selection.
+        if (templateType.equals("Mask")) {
+            // If template type is Mask, new mask is equal to an AND of the mask and
+            // selection.
             mask = new ImagePlus(Filer.getPath(basePath, "masks", "mask_" + templateTissue + ".tif"));
             Roi roi = imp.getRoi();
             imp.close();
