@@ -30,6 +30,11 @@ public class SegmentSublayers extends BatchCommand {
     @Parameter(label = "Number of sublayers:")
     private int numSublayers = Integer.parseInt(Defaults.get("numSublayers", "3"));
 
+    @Parameter(visibility = ItemVisibility.MESSAGE, persist = false)
+    private String info = "<p style='width: 500px;'>"
+            + "Segments the trabecular myocardium and endocardium (if present) into n sublayers (i.e. base/middle/apex/etc.). "
+            + "Currently only n=2 and n=3 sublayers are supported. ";
+
     @Parameter(label = "Run", callback = "runAll")
     private Button runButton;
 
