@@ -10,7 +10,7 @@ import org.scijava.plugin.Plugin;
 /** Displays some helpful info to the user. */
 @Plugin(type = Command.class, menu = {
         @Menu(label = "2D Macro Tool"),
-        @Menu(label = "Help", weight = 100)
+        @Menu(label = "Help...", weight = 100)
 })
 public class Help implements Command, Interactive {
 
