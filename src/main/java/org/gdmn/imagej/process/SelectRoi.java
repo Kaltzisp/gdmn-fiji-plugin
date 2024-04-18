@@ -26,7 +26,7 @@ import org.scijava.widget.Button;
         @Menu(label = "Select Roi", weight = 20)
 })
 public class SelectRoi extends BatchCommand {
-    @Parameter(visibility = ItemVisibility.MESSAGE)
+    @Parameter(visibility = ItemVisibility.MESSAGE, persist = false)
     private String header = "<h2 style='width: 500px'>Select ROI from image:</h2>";
 
     @Parameter(visibility = ItemVisibility.MESSAGE, persist = false)
