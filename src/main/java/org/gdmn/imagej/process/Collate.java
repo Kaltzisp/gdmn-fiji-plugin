@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -42,7 +43,7 @@ public class Collate extends BatchCommand {
         try {
             // Getting filepath array.
             String[] filePath = basePath.substring(this.selectedDir.length()).split("[\\\\/]");
-            String title = "Type,Stage,Group,Embryo,Region";
+            String title = "Type,Stage,Group,Embryo,Region,Image";
 
             // Reading content from data.txts.
             String content = new String(Files.readAllBytes(Paths.get(basePath, "data.txt")), StandardCharsets.UTF_8);
@@ -91,7 +92,10 @@ public class Collate extends BatchCommand {
             process(basePath);
         }
         try {
-            Files.write(Paths.get(this.selectedDir, "Data.csv"), this.output.getBytes(StandardCharsets.UTF_8));
+            Files.write(
+                    Paths.get(this.selectedDir, "Data.csv"),
+                    this.output.getBytes(StandardCharsets.UTF_8),
+                    StandardOpenOption.TRUNCATE_EXISTING);
 
         } catch (Exception e) {
             IJ.log(e.getMessage());
