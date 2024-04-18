@@ -43,10 +43,10 @@ public class SegmentLabel extends BatchCommand {
 
     @Parameter(visibility = ItemVisibility.MESSAGE, persist = false)
     private String info = "<p style='width: 500px;'>"
-            + "This command segments a label image into two new labels using a tissue mask. The inner_label will contain all nuclei within the mask boundaries,  "
-            + "while the outer_label will contain nuclei located outside the mask.<br><br>"
-            + "This command can be used in combination with the <i>Draw Custom Mask</i> to manually separate data that does't have specific staining (e.g. epicardial nuclei). "
-            + "It can also be used in a similar way to dispose of noisy data (e.g. blood) unuseful to analysis.<br><br>"
+            + "This command segments a label image into two new labels using a tissue mask. The inner_label will contain all nuclei within the mask "
+            + "boundaries, while the outer_label will contain nuclei located outside the mask.<br><br>"
+            + "This command can be used in combination with the <i>Draw Custom Mask</i> to manually separate data that does't have specific staining "
+            + "(e.g. epicardial nuclei). It can also be used in a similar way to dispose of noisy data (e.g. blood) unuseful to analysis.<br><br>"
             + "Do not include 'label_' or '.tif' when using this tool; only specify the tissue name. Alternatively, "
             + "use the dropdown menu below to load values for a preset configuration.";
 
