@@ -50,6 +50,10 @@ public class CleanChannels extends BatchCommand {
     @Parameter(label = "Crosstalk suppression", persist = false, style = NumberWidget.SLIDER_STYLE, min = "0", max = "10", stepSize = "0.1")
     private double crosstalkSuppression = 1;
 
+    @Parameter(visibility = ItemVisibility.MESSAGE, persist = false)
+    private String info = "<p style='width: 500px;'>"
+            + "Decreasing crosstalk suppression results in a more strongly stained image, but will increase the amount of noise recieved from other channels.";
+
     @Parameter(label = "Run", callback = "runAll")
     private Button runButton;
 
