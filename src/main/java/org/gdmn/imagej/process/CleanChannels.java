@@ -47,12 +47,13 @@ public class CleanChannels extends BatchCommand {
     @Parameter(label = "Channel 4", persist = false, choices = { "myo", "endo", "marker", "nuclei", "-" })
     private String channel4 = Defaults.get("channel4", "nuclei");
 
-    @Parameter(label = "Crosstalk suppression", persist = false, style = NumberWidget.SLIDER_STYLE, min = "0", max = "10", stepSize = "0.1")
+    @Parameter(label = "Noise suppression", persist = false, style = NumberWidget.SLIDER_STYLE, min = "0", max = "10", stepSize = "0.1")
     private double crosstalkSuppression = 1;
 
     @Parameter(visibility = ItemVisibility.MESSAGE, persist = false)
     private String info = "<p style='width: 500px;'>"
-            + "Decreasing crosstalk suppression results in a more strongly stained image, but will increase the amount of noise recieved from other channels.";
+            + "Increasing noise suppression will reduce the amount of crosstalk and/or noise from blood present in the image, "
+            + "but higher values will also result in loss of staining from the target channel.";
 
     @Parameter(label = "Run", callback = "runAll")
     private Button runButton;
