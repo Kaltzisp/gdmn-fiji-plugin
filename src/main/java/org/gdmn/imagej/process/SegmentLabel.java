@@ -29,29 +29,69 @@ public class SegmentLabel extends BatchCommand {
     @Parameter(visibility = ItemVisibility.MESSAGE)
     private String header = "<h2 style='width: 500px'>Segment label images</h2>";
 
+    @Parameter(label = "Base label", persist = false)
+    public String baseLabel = Defaults.get("baseLabel", "roi");
+
+    @Parameter(label = "Segmentation mask", persist = false)
+    public String segmentationMask = Defaults.get("segmentationMask", "myo");
+
+    @Parameter(label = "Inner label", persist = false)
+    public String innerLabel = Defaults.get("innerLabel", "myo");
+
+    @Parameter(label = "Outer label", persist = false)
+    public String outerLabel = Defaults.get("outerLabel", "endo");
+
+    @Parameter(visibility = ItemVisibility.MESSAGE, persist = false)
+    private String info = "<p style='width: 500px;'>"
+            + "This command segments a label image into two new labels using a tissue mask. The inner_label will contain all nuclei within the mask boundaries,  "
+            + "while the outer_label will contain nuclei located outside the mask.<br><br>"
+            + "This command can be used in combination with the <i>Draw Custom Mask</i> to manually separate data that does't have specific staining (e.g. epicardial nuclei). "
+            + "It can also be used in a similar way to dispose of noisy data (e.g. blood) unuseful to analysis.<br><br>"
+            + "Do not include 'label_' or '.tif' when using this tool; only specify the tissue name. Alternatively, "
+            + "use the dropdown menu below to load values for a preset configuration.";
+
     @Parameter(label = "Segmentation", choices = {
             "roi -> myo/endo",
             "myo -> compact/trabecular",
             "endo -> endo/epi",
-            "endo -> endo/coronary"
-    })
-    private String segmentationType = Defaults.get("segmentationType", "roi -> myo/endo");
+            "endo -> endo/coronaries"
+    }, callback = "updateSegmentation")
+    private String segmentationPreset = Defaults.get("segmentationPreset", "roi -> myo/endo");
 
     @Parameter(label = "Run", callback = "runAll")
     private Button runButton;
 
-    /**
-     * Running segmentLabel according to specified type.
-     */
+    /** Sets a segmentation preset. */
+    public void updateSegmentation() {
+        if (segmentationPreset.equals("roi -> myo/endo")) {
+            baseLabel = "roi";
+            segmentationMask = "myo";
+            innerLabel = "myo";
+            outerLabel = "endo";
+        } else if (segmentationPreset.equals("myo -> compact/trabecular")) {
+            baseLabel = "myo";
+            segmentationMask = "myo_compact";
+            innerLabel = "myo_compact";
+            outerLabel = "myo_trabecular";
+        } else if (segmentationPreset.equals("endo -> endo/epi")) {
+            baseLabel = "endo";
+            segmentationMask = "epi";
+            innerLabel = "epi";
+            outerLabel = "endo";
+        } else if (segmentationPreset.equals("endo -> endo/coronaries")) {
+            baseLabel = "endo";
+            segmentationMask = "myo_compact";
+            innerLabel = "coronaries";
+            outerLabel = "endo";
+        }
+    }
+
+    /** Running segmentLabel according to specified type. */
     public void process(String basePath) {
-        if (segmentationType.equals("roi -> myo/endo")) {
-            segmentLabel(basePath, "mask_myo.tif", "roi", "myo", "endo", false);
-        } else if (segmentationType.equals("myo -> compact/trabecular")) {
-            segmentLabel(basePath, "mask_myo_compact.tif", "myo", "myo_compact", "myo_trabecular", false);
-        } else if (segmentationType.equals("endo -> endo/epi")) {
-            segmentLabel(basePath, "mask_epi.tif", "endo", "epi", "endo", false);
-        } else if (segmentationType.equals("endo -> endo/coronary")) {
-            segmentLabel(basePath, "mask_myo_compact.tif", "endo", "coronaries", "endo", true);
+        if (innerLabel.equals("coronaries")) {
+            segmentLabel(basePath, "mask_" + segmentationMask + ".tif", baseLabel, innerLabel, outerLabel, true);
+        } else {
+            segmentLabel(basePath, "mask_" + segmentationMask + ".tif", baseLabel, innerLabel, outerLabel, false);
         }
     }
 
@@ -81,10 +121,8 @@ public class SegmentLabel extends BatchCommand {
             IJ.log("Mask not found: " + baseMask);
             return;
         }
-        // maskImp.setRoi(mask);
-        // maskImp.show();
-        // WaitForUserDialog dialog = new WaitForUserDialog("Draw mask", "Select mask then hit OK.");
-        // dialog.show();
+
+        // Closing mask image and creating ROI Managers.
         maskImp.close();
         RoiManager baseRoiManager = new RoiManager(false);
         final RoiManager altRoiManager = new RoiManager(false);
