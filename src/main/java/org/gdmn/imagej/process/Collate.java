@@ -95,6 +95,7 @@ public class Collate extends BatchCommand {
             Files.write(
                     Paths.get(this.selectedDir, "Data.csv"),
                     this.output.getBytes(StandardCharsets.UTF_8),
+                    StandardOpenOption.CREATE,
                     StandardOpenOption.TRUNCATE_EXISTING);
 
         } catch (Exception e) {
