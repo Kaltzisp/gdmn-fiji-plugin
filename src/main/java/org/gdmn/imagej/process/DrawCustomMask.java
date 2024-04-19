@@ -41,6 +41,10 @@ public class DrawCustomMask extends BatchCommand {
     @Parameter(label = "Generate trabecular mask", persist = false)
     private Boolean createTrabecularMask = Boolean.parseBoolean(Defaults.get("createTrabecularMask", "true"));
 
+    @Parameter(visibility = ItemVisibility.MESSAGE, persist = false)
+    private String info = "<p style='width: 500px;'>"
+            + "To create a trabecular mask, the output mask name must be 'mask_myo_compact.tif'. The trabecular mask will be the reverse of the compact mask.";
+
     @Parameter(label = "Run", callback = "runAll")
     private Button runButton;
 
@@ -110,7 +114,7 @@ public class DrawCustomMask extends BatchCommand {
         // Saving and closing.
         Filer.save(mask, basePath, "masks", outputMask);
 
-        if (createTrabecularMask) {
+        if (createTrabecularMask && outputMask.equals("mask_myo_compact.tif")) {
             Roi roi = mask.getRoi();
             ImagePlus trabecularMask = new ImagePlus(
                     Filer.getPath(basePath, "masks", "mask_" + templateTissue + ".tif"));
